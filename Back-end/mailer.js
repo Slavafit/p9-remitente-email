@@ -10,9 +10,6 @@ const transporter = nodemailer.createTransport(
             pass: 'pxwmekrmfyyrcour' 
         }
     },
-    {
-        from: 'Hola blyad'
-    }
 )
 
 
