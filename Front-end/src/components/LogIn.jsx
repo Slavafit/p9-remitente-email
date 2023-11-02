@@ -16,6 +16,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { authUser } from '../Service/AuthUser';
 import { useAuth } from '../Service/AuthContext'
 
+
 const WallPaper = styled('div')(({ theme }) => ({
   position: 'absolute',
   top: 0,
@@ -52,7 +53,7 @@ const TinyText = styled(Typography)({
     display: 'flex'
   });
 
-export default function SignIn() {
+export default function LogIn() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('')
     const [rememberMe, setRememberMe] = useState(false);
@@ -121,91 +122,91 @@ export default function SignIn() {
       <CssBaseline />
         <WallPaper >
           <Container>
-          <Widget>
-          <Box
-            sx={{
-              my: 4,
-              mx: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Avatar alt="logo Don Bosco" src={logo}/>
-            <Typography component="h1" variant="h5" sx={{ mt: 2 }}>
-              Sign in
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {isEmailValid ? (
-                <TinyText sx={{ color: 'green' }}>
-                  Email address is valid.
-                </TinyText>
-              ) : (
-                <TinyText sx={{ color: 'red' }}>
-                  Please, enter a valid email address.
-                </TinyText>
-              )}
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-                {isPassValid ? (
-                <TinyText sx={{ color: 'green' }}>
-                  Password is valid.
-                </TinyText>
-              ) : (
-                <TinyText sx={{ color: 'red' }}>
-                  minimum 4 and maximum 20 characters.
-                </TinyText>
-              )}
-                <FormControlLabel
-                  control={<Checkbox value="remember" color="primary" />}
-                  label="Remember me"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
+            <Widget>
+            <Box
+              sx={{
+                my: 4,
+                mx: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Avatar alt="logo Don Bosco" src={logo}/>
+              <Typography component="h1" variant="h5" sx={{ mt: 2 }}>
+                Log in
+              </Typography>
+              <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                endIcon={<VpnKeyIcon />}
-                disabled={!isEmailValid || !isPassValid ||!email || !password}
-              >
-                Sign In
-              </Button>
+                {isEmailValid ? (
+                  <TinyText sx={{ color: 'green' }}>
+                    Email address is valid.
+                  </TinyText>
+                ) : (
+                  <TinyText sx={{ color: 'red' }}>
+                    Please, enter a valid email address.
+                  </TinyText>
+                )}
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                  {isPassValid ? (
+                  <TinyText sx={{ color: 'green' }}>
+                    Password is valid.
+                  </TinyText>
+                ) : (
+                  <TinyText sx={{ color: 'red' }}>
+                    minimum 4 and maximum 20 characters.
+                  </TinyText>
+                )}
+                  <FormControlLabel
+                    control={<Checkbox value="remember" color="primary" />}
+                    label="Remember me"
+                    checked={rememberMe}
+                    onChange={() => setRememberMe(!rememberMe)}
+                  />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                  endIcon={<VpnKeyIcon />}
+                  disabled={!isEmailValid || !isPassValid ||!email || !password}
+                >
+                  Sign In
+                </Button>
+              </Box>
             </Box>
-          </Box>
-          <Typography sx={{
-              marginTop: 0,
-              textAlign: "center",
-              opacity: 0.8
-            }}>Fundacion Don Bosco © 
-              {' '}
-              {new Date().getFullYear()}
-              {'.'}
-            </Typography> 
-          </Widget>
+            <Typography sx={{
+                marginTop: 0,
+                textAlign: "center",
+                opacity: 0.8
+              }}>Fundacion Don Bosco © 
+                {' '}
+                {new Date().getFullYear()}
+                {'.'}
+              </Typography> 
+            </Widget>
           </Container>
         </WallPaper>
     </Grid>

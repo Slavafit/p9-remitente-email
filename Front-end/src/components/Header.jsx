@@ -50,8 +50,13 @@ export default function Header( {showMenu, refresh} ) {
                 )}
                 <Typography
                     variant='h6'
-                    component='span'
-                    sx={{flexGrow: 1}}
+                    component='a'
+                    href="/"
+                    sx={{
+                        color: 'inherit',
+                        textDecoration: 'none',
+                        letterSpacing: '.2rem',
+                        flexGrow: 1}}
                 >
                     Remitente
                 </Typography>

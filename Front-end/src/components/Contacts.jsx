@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -24,9 +22,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
-import AddEventModal from "./modals/addEventModal"
-import EditEnventModal from "./modals/editEventModal"
-import DeleteEventModal from "./modals/deleteEventModal"
+import AddContactModal from "./modals/addContactModal"
+import EditContactModal from "./modals/editContactModal"
+import DelContactModal from "./modals/delContactModal"
 import axios from "axios";
 import { addTokenToHeaders } from "../Service/AuthUser";
 
@@ -93,20 +91,21 @@ TablePaginationActions.propTypes = {
 };
 
 
-const EventTable = (({ showSnack, search, updateEvents }) => {
-  // console.log(search);
+const ContactTable = (({lists, showSnack, search }) => {
+  
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [events, setEvents] = React.useState([]);
+  const [contacts, setContacts] = React.useState([]);
   const [isAddOpen, setAddOpen] = React.useState(false);  //состояние модального окна добавления
   const [isEditOpen, setEditOpen] = React.useState(false);  //состояние модального окна изменения
   const [isDelOpen, setDelOpen] = React.useState(false);  //окно удаления
-  const [selectedEvent, setSelectedEvent] = useState(null); //выбраное событие
+  const [selContact, setSelContact] = useState(null); //выбраный контакт
   const [filtered, setFiltered] = useState([]);
 
+  // console.log("ContactTable",contacts);
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - events.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - contacts.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -124,57 +123,48 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
 
   //отображение GET
   useEffect(() => {
-    fetchEvents();
+    fetchContacts();
   }, []);
 
   //функция поиска
   useEffect(() => {
-    if (events.length > 0) {
-      const filteredData = events.filter(event =>
-        event.name.toLowerCase().includes(search.toLowerCase())
+    if (contacts.length > 0) {
+      const filteredData = contacts.filter(event =>
+        event.nombre.toLowerCase().includes(search.toLowerCase())
         // Другие условия фильтрации поиска здесь, если необходимо
       );
       setFiltered(filteredData);
     }
-  }, [events, search]);
+  }, [contacts, search]);
 
 
-  const fetchEvents = async () => {
+  const fetchContacts = async () => {
     try {
       addTokenToHeaders();
-      const response = await axios.get(`http://localhost:5000/events`);
-      let fetchedEvents = response.data;
-      // console.log("EventItem:", fetchedEvents)
-      setEvents(fetchedEvents);
-      updateEvents(fetchedEvents)
+      const response = await axios.get(`http://localhost:5000/contacts`);
+      let fetchedContacts = response.data;
+      // console.log("Contact:", fetchedContacts)
+      setContacts(fetchedContacts);
     } catch (error) {
-      console.error("Error fetching events:", error);
+      console.error("Error fetching contacts:", error);
     }
   };
 
+
   //добавление event
-  const handleAddEvent = async (eventData) => {
+  const handleAddContact = async (contactData) => {
+    // console.log(contactData);
     try {
       addTokenToHeaders();
-      // console.log(eventData);
-      // const formData = new FormData();
-      // formData.append('name', eventData.name);
-      // formData.append('description', eventData.description);
-      // formData.append('image', eventData.image);
-      // formData.append('startDate', eventData.startDate);
-      // formData.append('endDate', eventData.endDate);
       const response = await axios.post(
-        "http://localhost:5000/events/", eventData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        "http://localhost:5000/contacts/", contactData);
       setAddOpen(false);
+      // console.log(response.data);
       showSnack(response.data.message);
       setTimeout(() => {
-        fetchEvents();
-      }, 3000);
-      // console.log("Event created:", response.data.message);
+        fetchContacts();
+      }, 2000);
+      // console.log("contact created:", response.data.message);
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data;
@@ -191,131 +181,118 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
 
     //показать окно редактирования
     const openEditEvent = (event) => {
-      setSelectedEvent(event);
+      setSelContact(event);
       setEditOpen(true);
     };
     //закрыть окно редактирования
     const closeEditModal = () => {
-      setSelectedEvent(null);
+      setSelContact(null);
       setEditOpen(false);
     };
 
     const handleEditEvent = async (eventData) => {
       try {
         addTokenToHeaders();
-        await axios.put(`http://localhost:5000/events/?_id=${selectedEvent._id}`, eventData);
+        await axios.put(`http://localhost:5000/contacts/?_id=${selContact._id}`, eventData);
         setTimeout(() => {
-          fetchEvents();
+          fetchContacts();
         }, 3000);
         closeEditModal();
       } catch (error) {
-        console.error("Error updating event:", error);
+        console.error("Error updating contact:", error);
       }
     };
         
 
     // Функция для открытия модального окна удаления
     const openDeleteModal = (event) => {
-      setSelectedEvent(event._id); // Сохранение id события, которое будет удалено
+      setSelContact(event._id); // Сохранение id события, которое будет удалено
       setDelOpen(true);
     };
 
     //метод удаления delete
-    const handleDeleteEvent = async () => {
+    const handleDeleteContact = async () => {
       try {
+        console.log("handleDeleteContact",selContact);
         addTokenToHeaders();
-        await axios.delete(`http://localhost:5000/events/${selectedEvent}`);
+        const response = await axios.delete(`http://localhost:5000/contacts/${selContact}`);
+        showSnack(response.data.message);
         setDelOpen(false);
-        fetchEvents();
+        fetchContacts();
       } catch (error) {
-        console.error("Error delete event:", error);
+        console.error("Error delete contact:", error);
       }
     };
 
-
-
-
-
-  // Добавим функцию для преобразования даты и времени
-  const formatDate = (dateTimeString) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-
-    const dateTime = new Date(dateTimeString);
-    return dateTime.toLocaleString("en-GB", options);
-  };
 
 
   
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ backgroundColor: 'grey.300' }}>
         <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-          <Fab size="small" color="secondary" aria-label="add">
-            <AddIcon onClick={() => setAddOpen(true)}/>
-          </Fab>
-          {/* <Button
+          <Button
             variant="outlined"
             fullWidth
             
             onClick={() => setAddOpen(true)}
             startIcon={<AddCircleOutlineIcon />}
           >
-            Add event
-          </Button> */}
+            Add contact
+          </Button>
         </Stack>
-        <Table sx={{ minWidth: 500 }} aria-label="event pagination table">
+        <Table sx={{ minWidth: 500 }} aria-label="contact pagination table">
           <TableHead>
             <TableRow>
-              <TableCell>Image</TableCell>
-              <TableCell>Event</TableCell>
-              <TableCell>Event description</TableCell>
-              <TableCell align="right">Start Date&Time</TableCell>
-              <TableCell align="right">Adress</TableCell>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Cargo</TableCell>
+              <TableCell align="right">Entidad</TableCell>
+              <TableCell align="right">Categoria</TableCell>
+              <TableCell align="right">Provincia</TableCell>
+              <TableCell align="right">Territorio</TableCell>
+              <TableCell align="right">Email</TableCell>
+              <TableCell align="right">Telefono</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filtered
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((event) => (
-                <TableRow key={event._id}>
-                    <TableCell component="th" scope="row">
-                    {event.image && (
-                      <img
-                        src={event.image}
-                        alt="Event"
-                        width="50"
-                        height="50"
-                      />
-                    )}
-                    </TableCell>
+              .map((contact) => (
+                <TableRow key={contact._id}>
                   <TableCell component="th" scope="row">
-                    {event.name}
+                    {contact.nombre}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {event.description}
+                    {contact.cargo}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
-                    {formatDate(event.startDate)}
+                    {contact.entidad}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
-                    {event.adress}
+                    {contact.categoria}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {contact.provincia}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {contact.territorio}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {contact.email}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {contact.telefono}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Edit">
-                      <IconButton onClick={() => openEditEvent(event)}>
+                      <IconButton onClick={() => openEditEvent(contact)}>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete">
-                      <IconButton onClick={() => openDeleteModal(event)}>
+                      <IconButton onClick={() => openDeleteModal(contact)}>
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
@@ -333,7 +310,7 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={3}
-                count={events.length}
+                count={contacts.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{
@@ -349,29 +326,30 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
             </TableRow>
           </TableFooter>
         </Table>
-        <AddEventModal
+        <AddContactModal
           open={isAddOpen}
           close={closeAddModal}
-          onSubmit={handleAddEvent}
+          onSubmit={handleAddContact}
+          lists={lists}
         />
-        <EditEnventModal
+        <EditContactModal
           editOpen={isEditOpen}
           editClose={closeEditModal}
           onSubmit={handleEditEvent}
-          initName={selectedEvent ? selectedEvent.name : ""}
-          initDescrip={selectedEvent ? selectedEvent.description : ""}
-          initImage={selectedEvent ? selectedEvent.image : ""}
-          initStartDate={selectedEvent ? selectedEvent.startDate : ""}
-          initAdress={selectedEvent ? selectedEvent.adress : ""}
+          initName={selContact ? selContact.name : ""}
+          initDescrip={selContact ? selContact.description : ""}
+          initImage={selContact ? selContact.image : ""}
+          initStartDate={selContact ? selContact.startDate : ""}
+          initEndDate={selContact ? selContact.endDate : ""}
         />
-        <DeleteEventModal
+        <DelContactModal
           deleteOpen={isDelOpen}
           handleClose={()=>{setDelOpen(false)}}
-          onDelete={handleDeleteEvent}
+          onDelete={handleDeleteContact}
         />
       </TableContainer>
     </>
   );
 });
 
-export default EventTable;
+export default ContactTable;

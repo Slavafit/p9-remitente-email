@@ -15,18 +15,29 @@ router.post('/registration', [
 router.post('/login', controller.login)
 router.post('/events', [
      check('name', "event cannot be empty").notEmpty()
-     ], controller.createEvent)
+     ], authMiddleware, controller.createEvent)
+router.post('/lists', authMiddleware, controller.createList)
+router.post('/contacts', authMiddleware, controller.createContact)
 
-router.get('/users', controller.getUsers)
-router.get('/events', controller.getEvents)
+
+router.get('/users', authMiddleware, controller.getUsers)
+router.get('/personal', authMiddleware, controller.getUserByUsername)
+router.get('/events', authMiddleware, controller.getEvents)
+router.get('/lists', authMiddleware, controller.getLists)
+router.get('/contacts', authMiddleware, controller.getContacts)
 router.get('/dashboard', roleMiddleware(['ADMIN']), controller.getUsers)
 
 
-// router.put('/users', roleMiddleware(['ADMIN','USER']), controller.updateUser)
+router.put('/users', roleMiddleware(['ADMIN','USER']), controller.updateUser)
 router.put('/events', authMiddleware, controller.updateEvent)
+router.put('/contacts', authMiddleware, controller.updateContact)
+router.put('/lists', authMiddleware, controller.updateList)
+router.patch('/lists', authMiddleware, controller.patchList)
 
 router.delete('/events/:id', roleMiddleware(['ADMIN']), controller.deleteEvent)
 router.delete('/users', roleMiddleware(['ADMIN']), controller.deleteUser)
+router.delete('/lists', roleMiddleware(['ADMIN']), controller.deleteListValues)
+router.delete('/contacts/:id', roleMiddleware(['ADMIN']), controller.deleteContacts)
 
 
 

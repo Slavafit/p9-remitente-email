@@ -1,19 +1,12 @@
 import { Button, Paper, Typography } from '@mui/material'
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import React from 'react'
-
+import notFoundImage from './assets/404.png'
 
 const PageNotFound = () => {
 
 
   return (
-      <Paper
-        sx={{
-          backgroundColor: (t) => t.palette.background.default,
-          margin: 0,
-          height: `calc(100vh - 64px)`,
-        }}
-      >
+
         <div
           style={{
             display: 'flex',
@@ -23,24 +16,15 @@ const PageNotFound = () => {
             height: `100%`,
           }}
         >
-          <Typography variant="h6" color="secondary">
-            Page not found
-            </Typography>
-          <Typography variant="h4" sx={{ mt: 2 }}>
-            404
-            </Typography>
-          <Typography variant="subtitle1">
-          </Typography>
           <Button
-            color="secondary"
             aria-label="home"
             href="/"
             sx={{ mt: 2 }}
           >
-            <HomeRoundedIcon />
+            <img src={notFoundImage} alt="404 Image"/>
           </Button>
         </div>
-      </Paper>
+
   )
 }
 

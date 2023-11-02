@@ -2,6 +2,7 @@ const UserModel = require('./models/UserModel');
 const RoleModel = require('./models/RoleModel');   //импорт модели
 const EventModel = require('./models/EventModel');
 const ContactModel = require('./models/ContactModel');
+const ListModel = require('./models/ListModel');
 const mailer = require('./mailer');     //импорт настроек
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -99,6 +100,7 @@ class controller {
 
     async getUsers(req, res) {
         try {
+            // console.log("Received getUsers");
             const users = await UserModel.find()
             res.json(users)
         } catch (e) {
@@ -107,7 +109,39 @@ class controller {
         }
     }
 
+    async getUserByUsername(req, res) {
+        try {
+            const { username } = req.query;
+            // console.log("Received getUserByUsername request with:", username);
+            const user = await UserModel.findOne({username});    
+            if (!user) {
+                return res.status(404).json({message: `User with ${username} not found`})
+            }
+            //const users = await User.find()
+            return res.json({user})
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
 
+    async updateUser(req, res) {
+        try {
+            const { _id } = req.query;
+            const updatedUser = req.body; // обновленные данные из тела запроса
+            // console.log(_id)
+            // console.log(updatedUser)
+            //Заменяем найденное новым объектом
+            const user = await UserModel.findByIdAndUpdate(_id, updatedUser, { new: true });
+            if (!user) {
+                return res.status(404).json({ message: `User not updated` });
+            }
+            res.json(user); // обновленные данные в ответе
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
    
     // Обработчик для удаления User по Id
     async deleteUser(req, res) {
@@ -129,6 +163,9 @@ class controller {
         }
     }
 
+
+
+    // Обработчик получения event
     async getEvents(req, res) {
         try {
             const events = await EventModel.find()
@@ -138,23 +175,7 @@ class controller {
             res.status(500).json({ message: 'Server error' });
         }
     }
-
     // Обработчик создания event
-    // async createEvent(req, res) {
-    //     try {
-    //         const eventData = req.body; // Данные из тела запроса
-    //         // console.log(eventData);
-    //         const candidate = await EventModel.findOne({ name: eventData.name })    //ищем данные в БД
-    //         if (candidate) {        //если нашли вернули сообщение
-    //             return res.status(400).json({message: `Event ${eventData.name} already exists`})
-    //         }
-    //         const event = new EventModel({
-    //             name: eventData.name,
-    //             description: eventData.description,
-    //             image: { data: Buffer.from(eventData.image, 'base64'), contentType: 'image/png' },
-    //             startDate: eventData.startDate,
-    //             endDate: eventData.endDate
-    //         });
     async createEvent(req, res) {
         try {
             const eventData = req.body; // Данные из тела запроса
@@ -180,31 +201,23 @@ class controller {
             res.status(500).json({error: 'PostEvent error', message: e.message})
         }
     }
-        
+    // Обработчик обновления event    
     async updateEvent(req, res) {
         try {
-            const { eventData } = req.body; // обновленные данные  из тела запроса
-            //Заменяем найденую песню новым объектом
-            const candidate = await EventModel.findOne( eventData.name);
-            if (!candidate) {
-                return res.status(400).json({ message: `Event ${eventData.name} already exists` });
+            const { _id } = req.query;
+            const eventData = req.body; // обновленные данные  из тела запроса
+            //Заменяем  новым объектом
+            const event = await EventModel.findByIdAndUpdate(_id, eventData, { new: true });
+            if (!event) {
+                return res.status(400).json({ message: `Event ${eventData.name} not updated` });
             }
-            const newEvent = new EventModel({
-                name, 
-                description, 
-                image: { data: Buffer.from(imageData, 'base64'), contentType: 'image/png' }, 
-                startDate, 
-                endDate})  //создаем event
-            await newEvent.save()   //сохраняем в БД
-
-            res.json(newEvent); // Отправьте обновленные данные event в ответе
+            res.json(event); // Отправьте обновленные данные event в ответе
         } catch (e) {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
     }
-
-        // Обработчик для удаления event по ID
+    // Обработчик удаления event
     async deleteEvent(req, res) {
         const eventId = req.params.id;
         // console.log("Received deleteEvent request with Id:", eventId);
@@ -219,7 +232,207 @@ class controller {
             res.status(500).json({ message: 'Error deleting event' });
           }
         }            
- 
+    
+    
+    // Обработчик получения Contact
+    async getContacts(req, res) {
+        try {
+            const contacts = await ContactModel.find()
+            res.json(contacts)
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик создания Contact
+    async createContact(req, res) {
+        try {
+            const contactData = req.body; // Данные из тела запроса
+            console.log("createContact",contactData);
+            const candidate = await ContactModel.findOne({ email: contactData.email })    //ищем данные в БД
+            if (candidate) {        //если нашли вернули сообщение
+                return res.status(400).json({message: `Contact with ${contactData.email} already exists`})
+            }
+            const contact = new ContactModel({
+                nombre: contactData.nombre,
+                cargo: contactData.cargo,
+                entidad: contactData.entidad,
+                categoria: contactData.categoria,
+                provincia: contactData.provincia,
+                territorio: contactData.territorio,
+                email: contactData.email,
+                telefono: contactData.telefono
+            });
+
+            await contact.save()   //сохраняем в БД
+            return res.json({message: `${contactData.nombre} with ${contactData.email} successfully saved`})  //вернули сообщение клиенту
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({error: 'createContact error', message: e.message})
+        }
+    }
+    // Обработчик обновления Contact    
+    async updateContact(req, res) {
+        try {
+            const { _id } = req.query;
+            const сontactData = req.body; // обновленные данные  из тела запроса
+            //Заменяем  новым объектом
+            const сontact = await ContactModel.findByIdAndUpdate(_id, сontactData, { new: true });
+            if (!сontact) {
+                return res.status(400).json({ message: `Event ${сontactData.nombre} not updated` });
+            }
+            res.json(сontact); // Отправьте обновленные данные event в ответе
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик удаления Contact
+    async deleteContacts(req, res) {
+        const contactId = req.params.id;
+        console.log("Received deleteContacts request", contactId);
+        try {
+            const contact = await ContactModel.findByIdAndDelete(contactId); // Используйте _id напрямую
+            if (!contact) {
+                return res.status(404).json({ message: `Contact not found` });
+            }
+            res.json({ message: `Contact was deleted successfully` });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Server error' });
+        }
+      }
+
+
+        
+    // Обработчик получения list
+    async getLists(req, res) {
+        try {
+            const lists = await ListModel.find()
+                  // Проверка: если коллекция пуста
+            if (!lists || lists.length === 0) {
+                return res.status(404).json({ message: 'No lists found' });
+            }
+            res.status(200).json( lists );
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик создания list
+    async createList(req, res) {
+            try {
+                const { provincia, entidad, categoria, territorio } = req.body;
+                // console.log("createList");
+                // Проверка переданных данных от клиента
+                const data = { provincia, entidad, categoria, territorio };
+                const validFields = Object.keys(data).filter(key => data[key]);
+
+                if (validFields.length === 0) {
+                    return res.status(400).json({ message: 'At least one field must be provided' });
+                }
+                // Создаем новую запись
+                const newList = new ListModel({});
+
+                validFields.forEach(field => {
+                newList[field] = data[field];
+                });
+
+                // Сохраняем запись в базу данных
+                await newList.save();
+                res.status(201).json({ message: 'List created successfully'});
+            } catch (e) {
+                console.log(e)
+                res.status(500).json({error: 'PostList error', message: e.message})
+            }
+    }
+    // Обработчик обновления list    
+    async updateList(req, res) {
+        try {
+            const { _id, provincia, entidad, categoria, territorio } = req.body;
+            const updatedFields = {};
+            // console.log("updateList",_id,entidad);
+            // Проверяем какие поля были отправлены и обновляем соответствующие массивы
+            if (provincia) updatedFields.provincia = provincia;
+            if (entidad) updatedFields.entidad = entidad;
+            if (categoria) updatedFields.categoria = categoria;
+            if (territorio) updatedFields.territorio = territorio;
+
+            const updatedList = await ListModel.findByIdAndUpdate(
+                _id,
+                { $set: updatedFields },
+                { new: true }
+              );
+          
+              if (!updatedList) {
+                return res.status(404).json({ message: 'List not found' });
+              }
+          
+              res.json(updatedList);
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик частичного обновления значений массивов
+    async patchList(req, res) {
+        try {
+        const { _id, provincia, entidad, categoria, territorio } = req.body;
+        // console.log("patchList",_id,entidad);
+        const updatedFields = {};
+        
+        if (provincia) updatedFields.provincia = provincia;
+        if (entidad) updatedFields.entidad = entidad;
+        if (categoria) updatedFields.categoria = categoria;
+        if (territorio) updatedFields.territorio = territorio;
+    
+        const updatedList = await ListModel.findByIdAndUpdate(
+            _id,
+            { $addToSet: updatedFields }, // Используем $addToSet для добавления значений в массивы
+            { new: true }
+        );
+    
+        if (!updatedList) {
+            return res.status(404).json({ message: 'List not found' });
+        }
+    
+        res.json({ message: 'successfully' });
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик удаления list
+    async deleteListValues(req, res) {
+        const { _id, provincia, entidad, categoria, territorio } = req.body;
+        console.log("Received deleteListValues request", _id);
+        try {
+          const updateQuery = {};
+      
+          if (provincia) updateQuery.provincia = { $pull: { $in: provincia } };
+          if (entidad) updateQuery.entidad = { $pull: { $in: entidad } };
+          if (categoria) updateQuery.categoria = { $pull: { $in: categoria } };
+          if (territorio) updateQuery.territorio = { $pull: { $in: territorio } };
+      
+          const updatedList = await ListModel.findByIdAndUpdate(
+            _id,
+            {
+              $pull: updateQuery // Используем $pull без $in для удаления элементов
+            },
+            { new: true }
+          );
+      
+          if (!updatedList) {
+            return res.status(404).json({ message: 'List not found' });
+          }
+      
+          res.json(updatedList);
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Server error' });
+        }
+      }
+      
 }
 
 module.exports = new controller()

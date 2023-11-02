@@ -14,10 +14,10 @@
     "@mui/material": "^5.14.15",
     "@mui/x-date-pickers": "^6.17.0",
     "dayjs": "^1.11.10",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.17.0",
-    "sweetalert2": "^11.6.13"
+    "react-router-dom": "^6.17.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

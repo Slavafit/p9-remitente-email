@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 
 // Функция для аутентификации пользователя
 const authUser = async (email, password) => {
@@ -31,7 +31,7 @@ const authUser = async (email, password) => {
     // Вернуть ошибку аутентификации
     const response = error.response.data.message
     console.log("Error authUser", response);
-    showAlert(response);
+    // showAlert(response);
     return false;
   }
 

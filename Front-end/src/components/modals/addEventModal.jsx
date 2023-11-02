@@ -20,7 +20,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
     description: '',
     image: '',
     startDate: '',
-    endDate: '',
+    adress: '',
   });
 
   const handleInputChange = (e) => {
@@ -38,7 +38,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
       description: '',
       image: '',
       startDate: '',
-      endDate: '',
+      adress: '',
     });
     // console.log(eventData)
   };
@@ -76,6 +76,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
           >
           <DialogContentText>Fill in the fields for the new event:</DialogContentText>
           <TextField
+            required
             label="Event Name"
             name="name"
             type="Text"
@@ -90,7 +91,8 @@ const AddEventModal = ({ open, onSubmit, close }) => {
             onChange={handleInputChange}
           />
           <TextField
-            // label="Event Image"
+            required
+            label="Event Image"
             type="file"
             accept="image/*"
             onChange={handleImageChange}
@@ -104,14 +106,13 @@ const AddEventModal = ({ open, onSubmit, close }) => {
               renderInput={(params) => <TextField {...params} />}
               />
           </LocalizationProvider>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <DesktopDateTimePicker
-              label="End Date and Time"
-              value={eventData.startDate}
-              onChange={(newDate) => handleDateTimeChange(newDate, 'endDate')}
-              renderInput={(params) => <TextField {...params} />}
-              />
-          </LocalizationProvider>
+          <TextField
+            label="Event adress"
+            name="adress"
+            type="Text"
+            value={eventData.adress}
+            onChange={handleInputChange}
+          />
         </DialogContent>
       <DialogActions>
         <Button onClick={close} color="primary">

@@ -4,10 +4,10 @@ import { TextField } from "@mui/material";
     const { onChange, value, handleSearch} = props;
 
       //обработчик клавиш
-    const handleKeyPress = (e) => {
-        if (e.key === "Enter")
-        handleSearch();
-    };
+    // const handleKeyPress = (e) => {
+    //     if (e.key === "Enter")
+    //     handleSearch();
+    // };
 
     return (
         <>
@@ -18,7 +18,7 @@ import { TextField } from "@mui/material";
                 type="search"
                 value={value}
                 onChange={onChange}
-                onKeyDown={handleKeyPress}
+                // onKeyDown={handleKeyPress}
             />
         </> 
     )

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Home from './Home'
-import SignIn from './components/SignIn';
+import LogIn from './components/LogIn';
 import PageNotFound from './PageNotFound';
 import {
   BrowserRouter as Router,
@@ -33,8 +33,8 @@ function App() {
           <Routes>
             <Route path="/home" element={<Home />} />
             {/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
-            <Route path="/" element={<SignIn />} />
-            {/* <Route path="*" element={<PageNotFound />} /> */}
+            <Route path="/" element={<LogIn />} />
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Router>
       </AuthProvider>

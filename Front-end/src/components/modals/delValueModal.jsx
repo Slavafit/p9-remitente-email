@@ -1,17 +1,17 @@
 import React from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-const DeleteEventModal = ({ deleteOpen, handleClose, onDelete }) => {
+const DeleteValueModal = ({ deleteOpen, deleteClose, onDelete }) => {
   return (
-    <Dialog open={deleteOpen} onClose={handleClose}>
-      <DialogTitle>Delete event</DialogTitle>
+    <Dialog open={deleteOpen} onClose={deleteClose}>
+      <DialogTitle>Delete value</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this event? <br />This action cannot be undone.
+          Are you sure you want to delete this value? <br />This action cannot be undone.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={deleteClose} color="primary">
           Cancel
         </Button>
         <Button onClick={onDelete} color="primary">
@@ -22,4 +22,4 @@ const DeleteEventModal = ({ deleteOpen, handleClose, onDelete }) => {
   );
 };
 
-export default DeleteEventModal;
+export default DeleteValueModal;
