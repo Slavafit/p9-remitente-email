@@ -13,8 +13,8 @@ import { styled, useTheme } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/donbosco_logo.png";
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { authUser } from '../Service/AuthUser';
-import { useAuth } from '../Service/AuthContext'
+import {useAuth} from '../service/AuthContext'
+import { authUser } from '../service/AuthUser'
 
 
 const WallPaper = styled('div')(({ theme }) => ({

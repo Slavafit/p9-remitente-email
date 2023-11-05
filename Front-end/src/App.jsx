@@ -8,7 +8,7 @@ import {
   Routes,
   useNavigate
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./Service/AuthContext";
+import { AuthProvider, useAuth } from "./service/AuthContext";
 
 
 

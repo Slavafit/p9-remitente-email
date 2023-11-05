@@ -5,7 +5,8 @@ const EventModel = new Schema({
     description: {type: String },
     image: {type: String },
     startDate: { type: Date },
-    endDate: { type: Date },
+    adress: { type: String },
+    used: { type: Boolean, default: false }
 })
 
 module.exports = model('Event', EventModel)

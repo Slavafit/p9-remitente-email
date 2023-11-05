@@ -83,13 +83,21 @@ const AddContactModal = ({ open, onSubmit, close, lists }) => {
             value={contactData.nombre}
             onChange={handleInputChange}
           />
-          <TextField
-            label="cargo"
-            name="cargo"
-            type="Text"
-            value={contactData.cargo}
-            onChange={handleInputChange}
-          />
+          <FormControl variant="outlined">
+          <InputLabel>Cargo</InputLabel>
+            <Select
+              label="cargo"
+              name="cargo"
+              value={contactData.cargo}
+              onChange={handleInputChange}
+            >
+              {lists && lists.cargo && lists.cargo.map((item, index) => (
+                <MenuItem key={index} value={item}>
+                  {item}
+                </MenuItem>
+              ))}
+            </Select>
+            </FormControl>
           <FormControl variant="outlined">
           <InputLabel>Entidad</InputLabel>
             <Select
@@ -152,6 +160,7 @@ const AddContactModal = ({ open, onSubmit, close, lists }) => {
             </Select>
             </FormControl>
           <TextField
+            required
             label="email"
             name="email"
             type="email"

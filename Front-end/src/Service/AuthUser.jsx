@@ -1,5 +1,4 @@
 import axios from 'axios';
-// import Swal from 'sweetalert2';
 
 // Функция для аутентификации пользователя
 const authUser = async (email, password) => {
@@ -20,10 +19,12 @@ const authUser = async (email, password) => {
       const token = response.data.token;
       const userId = response.data.userData.userId;
       const username = response.data.userData.username;
+      const userRole = response.data.userData.role;
       // Сохранить токен и остальное в localStorage или в памяти приложения
-      localStorage.setItem('token', token)
+      localStorage.setItem('token', token);
       localStorage.setItem('userId', userId);
       localStorage.setItem('username', username);
+      localStorage.setItem('userRole', userRole);
       // Вернуть успех
       return true;
     }

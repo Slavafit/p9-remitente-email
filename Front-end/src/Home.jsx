@@ -6,13 +6,16 @@ import Search from './components/Search'
 import EventTable from './components/EventItem';
 import CssBaseline from '@mui/material/CssBaseline';
 import Snack from './components/Snack';
-import MailItem from './components/MailItem';
+import MailManager from './components/MailManager';
 import ProfilePage from './Personal';
 import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ContactTable from './components/Contacts'
 import ListManager from './components/ListManager'
-
+import Remitente from './components/Remitente'
+import ShowBackdrop from './service/Loading'
+import SignUp from './service/AddUser';
+import UsersTable from './UsersTable'
 
 
 
@@ -24,17 +27,20 @@ function Home() {
   const [snackMessage, setSnackMessage] = useState('');
   const [displayItem, setDisplayItem] = useState('');
   const [displayMail, setDisplayMail] = useState(''); 
-  const [showPersonal, setShowPersonal] = useState(); 
+  const [showPersonal, setShowPersonal] = React.useState(null); 
+  const [showSignUp, setShowSignUp] = React.useState(null); 
+  const [showUsersTable, setUsersTable] = React.useState(null); 
   const [events, setEvents] = useState([]);
   const [contacts, setContacts] = useState([]);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState('panel1');
   const [lists, setLists] = useState({});
+  const [loading, setLoading] = React.useState(false);
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   const handleShowSnack = (message) => {
     setSnackMessage(message);
     setSnackOpen(true);
   };
-
 
   const updateEvents = (updatedEvents) => {
     // console.log("Home", updatedEvents)
@@ -44,10 +50,31 @@ function Home() {
     // console.log("Home", updatedLists)
     setLists(updatedLists);
   };
+  const updateContacts = (updatedContacts) => {
+    // console.log("Home", contacts)
+    setContacts(updatedContacts);
+  };
+  const openPeronal = () => {
+    setDisplayItem(null);
+    setDisplayMail(null);
+    setShowPersonal(true);
+  };
+  const openSignUp = () => {
+    setShowSignUp(true);
+  };
+  const openUsersTable = () => {
+    setUsersTable(true);
+  };
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
+
+  const handleRefresh = () => {
+    // Обновляем флаг для вызова обновления данных в MailManager
+    setRefreshFlag(!refreshFlag);
+  };
+
 
   return (
     <>
@@ -55,12 +82,10 @@ function Home() {
       <Container>
         <Header
           showMenu={() => setMenuOpen(true)}
-          refresh={updateEvents}
-          showPersonal={() => {
-            setDisplayItem(null);
-            setDisplayMail(null);
-            setShowPersonal(true);
-          }}
+          refresh={handleRefresh}
+          showPersonal={openPeronal}
+          showSignUp={openSignUp}
+          showUsersTable={openUsersTable}
           />
         <Search
           value={search}
@@ -71,54 +96,80 @@ function Home() {
             showSnack={handleShowSnack}
             search={search}
             updateEvents={updateEvents}
+            setLoading={setLoading}
           />
         )}
-        {displayMail === 'MailItem' && (
-          <MailItem
+        {displayMail === 'MailManager' && (
+          <MailManager
             events={events}
+            contacts={contacts}
+            search={search}
           />
         )}
-        <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+        <Accordion sx={{ backgroundColor: 'grey.200' }} expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>Mail</Typography>
+            <Typography title="open/close mail status">Tabla de respuestas</Typography>
           </AccordionSummary>
           <AccordionDetails>
-              <MailItem events={events} />
+              <MailManager
+              events={events}
+              contacts={contacts}
+              search={search}
+              setLoading={setLoading}
+              refreshFlag={refreshFlag}
+             />
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+        <Accordion sx={{ backgroundColor: 'grey.200' }} expanded={expanded === 'panel5'} onChange={handleChange('panel5')}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>Events</Typography>
+            <Typography title="open/close ">Remitente de invitaciones</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+              <Remitente
+                contacts={contacts}
+              />
+          </AccordionDetails>
+        </Accordion>
+        <Accordion sx={{ backgroundColor: 'grey.200' }} expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography title="open/close events">Gestión de eventos</Typography>
           </AccordionSummary>
           <AccordionDetails>
               <EventTable
                 showSnack={handleShowSnack}
                 search={search}
                 updateEvents={updateEvents}
+                setLoading={setLoading}
+                refreshFlag={refreshFlag}
               />
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+        <Accordion sx={{ backgroundColor: 'grey.200' }} expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>Contacts</Typography>
+            <Typography  title="open/close contacts">Gestión de сontactos</Typography>
           </AccordionSummary>
           <AccordionDetails>
               <ContactTable
                 showSnack={handleShowSnack}
                 search={search}
                 lists={lists}
+                updateContacts={updateContacts}
+                setLoading={setLoading}
+                refreshFlag={refreshFlag}
               />
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
+        <Accordion sx={{ backgroundColor: 'grey.200' }} expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>List manager</Typography>
+            <Typography title="open/close directory">Directorio de campos de contacto</Typography>
           </AccordionSummary>
           <AccordionDetails>
               <ListManager
                 showSnack={handleShowSnack}
                 search={search}
                 updateLists={updateLists}
+                setLoading={setLoading}
+                refreshFlag={refreshFlag}
               />
           </AccordionDetails>
         </Accordion>
@@ -129,26 +180,44 @@ function Home() {
           onEventTable={() => {
             setDisplayItem('EventTable'); // При выборе EventTable скрываем MailItem
             setDisplayMail(null);
-            setShowPersonal(null);
+            setShowPersonal(false);
           }}
           onMailItem={() => {
             setDisplayMail('MailItem'); // При выборе MailItem скрываем EventTable
             setDisplayItem(null);
-            setShowPersonal(null);
+            setShowPersonal(false);
           }}
         />
-          {showPersonal && (
-            <ProfilePage
-              menuClose={() => setShowPersonal(false)}
-              showSnack={handleShowSnack}
-            />
-          )}
+        {showPersonal && (
+          <ProfilePage
+            showSnack={handleShowSnack}
+            open={open}
+            close={()=>setShowPersonal(false)}
+          />
+        )}
+        {showSignUp && (
+          <SignUp
+            showSnack={handleShowSnack}
+            open={open}
+            close={()=>setShowSignUp(false)}
+          />
+        )}
+        {showUsersTable && (
+          <UsersTable
+            showSnack={handleShowSnack}
+            open={open}
+            close={()=>setUsersTable(false)}
+          />
+        )}
         <Snack
           snackOpen={snackOpen}
           handleClose={()=>setSnackOpen(false)}
           message={snackMessage}
         />
-
+        <ShowBackdrop
+          loading={loading}
+          setLoading={setLoading}
+        />
 
     </>
   )

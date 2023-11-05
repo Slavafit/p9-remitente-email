@@ -13,7 +13,8 @@ import { TextField } from "@mui/material";
         <>
             <TextField
                 fullWidth
-                label="Search"
+                title="Búsqueda" 
+                label="Búsqueda"
                 variant="filled"
                 type="search"
                 value={value}

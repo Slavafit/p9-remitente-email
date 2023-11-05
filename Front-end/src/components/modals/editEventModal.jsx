@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import Paper from '@mui/material/Paper';
 
 const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip, initImage, initStartDate, initAdress }) => {
   const [name, setName] = useState('');
@@ -39,10 +40,27 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
     const handleStartDateChange = (event) => {
       setStartDate(event.target.value);
     };
+
+    // const formatDate = (dateString) => {
+    //   const date = new Date(dateString);
+    //   return date.toLocaleString(); // Можете использовать другие методы форматирования даты
+    // };
+
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
   
     const handleAdressChange = (event) => {
       setAdress(event.target.value);
     };
+    
 
     const eventData = {
       name: name,
@@ -51,11 +69,17 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
       startDate: startDate,
       adress: adress
     };
-    // console.log(eventData);
 
   return (
     <Dialog open={editOpen} onClose={editClose}>
       <DialogTitle>Edit event</DialogTitle>
+      <Paper sx={{
+                  m:3,
+                  padding: 3,
+                  borderRadius: 5,
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)', 
+                  backgroundColor: 'grey.300'
+                  }}>
       <DialogContent>
         <DialogContentText>Enter the new event details:</DialogContentText>
         <TextField
@@ -84,7 +108,7 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
           // label="Start Date" 
           fullWidth
           type="datetime"
-          value={startDate}
+          value={formatDate(startDate)}
           onChange={handleStartDateChange}
         />
         <TextField
@@ -96,6 +120,7 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
           onChange={handleAdressChange}
         />
       </DialogContent>
+      </Paper>
       <DialogActions>
         <Button onClick={editClose} color="primary">
           Cancel

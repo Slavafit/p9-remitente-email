@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -11,22 +12,37 @@ import TableFooter from '@mui/material/TableFooter';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import AddContactModal from "./modals/addContactModal"
 import EditContactModal from "./modals/editContactModal"
 import DelContactModal from "./modals/delContactModal"
 import axios from "axios";
-import { addTokenToHeaders } from "../Service/AuthUser";
+import { addTokenToHeaders } from "../service/AuthUser";
+
+
+const StyledFab = styled(Fab)({
+  position: 'absolute',
+  zIndex: 1,
+  top: 9,
+  left: "20%",
+  right: 0,
+  margin: '0 auto',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
+});
 
 
 function TablePaginationActions(props) {
@@ -91,7 +107,7 @@ TablePaginationActions.propTypes = {
 };
 
 
-const ContactTable = (({lists, showSnack, search }) => {
+const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, refreshFlag }) => {
   
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -121,10 +137,7 @@ const ContactTable = (({lists, showSnack, search }) => {
     setAddOpen(false);
   };
 
-  //отображение GET
-  useEffect(() => {
-    fetchContacts();
-  }, []);
+
 
   //функция поиска
   useEffect(() => {
@@ -138,23 +151,32 @@ const ContactTable = (({lists, showSnack, search }) => {
   }, [contacts, search]);
 
 
+    //отображение GET
   const fetchContacts = async () => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       const response = await axios.get(`http://localhost:5000/contacts`);
       let fetchedContacts = response.data;
       // console.log("Contact:", fetchedContacts)
       setContacts(fetchedContacts);
+      updateContacts(fetchedContacts);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching contacts:", error);
     }
   };
+
+    useEffect(() => {
+      fetchContacts();
+    }, [refreshFlag]);
 
 
   //добавление event
   const handleAddContact = async (contactData) => {
     // console.log(contactData);
     try {
+      setLoading(true);
       addTokenToHeaders();
       const response = await axios.post(
         "http://localhost:5000/contacts/", contactData);
@@ -165,6 +187,7 @@ const ContactTable = (({lists, showSnack, search }) => {
         fetchContacts();
       }, 2000);
       // console.log("contact created:", response.data.message);
+      setLoading(false);
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data;
@@ -190,14 +213,21 @@ const ContactTable = (({lists, showSnack, search }) => {
       setEditOpen(false);
     };
 
-    const handleEditEvent = async (eventData) => {
+    const handleEditEvent = async (contactData) => {
       try {
-        addTokenToHeaders();
-        await axios.put(`http://localhost:5000/contacts/?_id=${selContact._id}`, eventData);
-        setTimeout(() => {
-          fetchContacts();
-        }, 3000);
-        closeEditModal();
+        setLoading(true);
+        // console.log(contactData)
+        const response = await axios.put(
+          `http://localhost:5000/contacts/?_id=${selContact._id}`, contactData);
+          let message = response.data.nombre
+        if (response.status === 200) {
+          closeEditModal();
+          showSnack(`Contact ${message} was updated`);
+          setTimeout(() => {
+            fetchContacts();
+          }, 2000);
+        }
+        setLoading(false);
       } catch (error) {
         console.error("Error updating contact:", error);
       }
@@ -213,12 +243,14 @@ const ContactTable = (({lists, showSnack, search }) => {
     //метод удаления delete
     const handleDeleteContact = async () => {
       try {
-        console.log("handleDeleteContact",selContact);
+        setLoading(true);
+        // console.log("handleDeleteContact",selContact);
         addTokenToHeaders();
         const response = await axios.delete(`http://localhost:5000/contacts/${selContact}`);
         showSnack(response.data.message);
         setDelOpen(false);
         fetchContacts();
+        setLoading(false);
       } catch (error) {
         console.error("Error delete contact:", error);
       }
@@ -230,19 +262,13 @@ const ContactTable = (({lists, showSnack, search }) => {
 
   return (
     <>
-      <TableContainer component={Paper} sx={{ backgroundColor: 'grey.300' }}>
-        <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-          <Button
-            variant="outlined"
-            fullWidth
-            
-            onClick={() => setAddOpen(true)}
-            startIcon={<AddCircleOutlineIcon />}
-          >
-            Add contact
-          </Button>
+      <TableContainer component={Paper}>
+        <Stack direction="row" spacing={2}>
+          <StyledFab title="add contact" size="small" color="secondary">
+            <AddIcon onClick={() => setAddOpen(true)}/>
+          </StyledFab>
         </Stack>
-        <Table sx={{ minWidth: 500 }} aria-label="contact pagination table">
+        <Table sx={{ minWidth: 500, backgroundColor: 'grey.300' }} aria-label="contact pagination table">
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
@@ -336,11 +362,15 @@ const ContactTable = (({lists, showSnack, search }) => {
           editOpen={isEditOpen}
           editClose={closeEditModal}
           onSubmit={handleEditEvent}
-          initName={selContact ? selContact.name : ""}
-          initDescrip={selContact ? selContact.description : ""}
-          initImage={selContact ? selContact.image : ""}
-          initStartDate={selContact ? selContact.startDate : ""}
-          initEndDate={selContact ? selContact.endDate : ""}
+          lists={lists}
+          initNombre={selContact ? selContact.nombre : ""}
+          initCargo={selContact ? selContact.cargo : ""}
+          initEntidad={selContact ? selContact.entidad : ""}
+          initCategoria={selContact ? selContact.categoria : ""}
+          initProvincia={selContact ? selContact.provincia : ""}
+          initTerritorio={selContact ? selContact.territorio : ""}
+          initEmail={selContact ? selContact.email : ""}
+          initTelefono={selContact ? selContact.telefono : ""}
         />
         <DelContactModal
           deleteOpen={isDelOpen}

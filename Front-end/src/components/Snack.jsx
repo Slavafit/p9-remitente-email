@@ -15,9 +15,9 @@ import MuiAlert from '@mui/material/Alert';
             <Snackbar 
                 open={snackOpen}
                 onClose={handleClose}
-                autoHideDuration={5000}
+                autoHideDuration={6000}
                  >
-                <Alert severity="info" variant="filled">
+                <Alert severity="warning" variant="filled">
                     {message}
                 </Alert>
             </Snackbar>

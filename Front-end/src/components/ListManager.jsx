@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import { Box, OutlinedInput, InputLabel, MenuItem, FormControl, Select, Paper, TextField, Button, IconButton } from '@mui/material';
 import _ from 'lodash';
 import axios from 'axios';
-import { addTokenToHeaders } from "../Service/AuthUser";
+import { addTokenToHeaders } from "../service/AuthUser";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -31,11 +31,12 @@ function getStyles(name, selectedItem, theme) {
   };
 }
 
-function ListManager({ updateLists, search, showSnack }) {
+function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }) {
   const [isDelOpen, setDelOpen] = useState(false);  //окно удаления
   const theme = useTheme();
   const [lists, setLists] = useState({});
   const [newItems, setNewItems] = useState({
+    cargo: '',
     provincia: '',
     entidad: '',
     categoria: '',
@@ -43,22 +44,25 @@ function ListManager({ updateLists, search, showSnack }) {
   });
   const [editItem, setEditItem] = useState({ listName: '', itemIndex: null, newValue: '' });
 
-  useEffect(() => {
-    fetchLists();
-  }, []);
 
   const fetchLists = async () => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       const response = await axios.get(`http://localhost:5000/lists`);
       let fetchedLists = response.data[0]; // Получаем первый объект из массива
       // console.log("get",fetchedLists);
       setLists(fetchedLists);
       updateLists(fetchedLists)
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching lists:", error);
     }
   };
+
+  useEffect(() => {
+    fetchLists();
+  }, [refreshFlag]);
 
 
     //добавление новых значений в массивы
@@ -72,20 +76,25 @@ function ListManager({ updateLists, search, showSnack }) {
 
   const handleAddItem = (listName) => async () => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       const updatedList = {
         _id: lists._id,
         [listName]: [...lists[listName], newItems[listName]] // Добавить новый элемент к массиву
       };
-      console.log("post-patch",listName)
-      await axios.patch(`http://localhost:5000/lists/`,updatedList);
-      showSnack(`${newItems[listName]} added in ${listName} successfully`);
-      setTimeout(() => {
-        fetchLists();
-      }, 1000);
+      // console.log("post-patch",listName)
+      const response = await axios.patch(`http://localhost:5000/lists/`,updatedList);
+      // console.log(response.data);
+      if (response.status === 200) {
+        showSnack(`"${newItems[listName]}" added in "${listName}" successfully`);
+        setTimeout(() => {
+          fetchLists();
+        }, 1000);
+      }
+      setLoading(false);
     } catch (error) {
-      // showSnack(error.data.message);
-      console.error(`Error adding item to ${listName}:`, error);
+        showSnack(error.data.message);
+        console.error(`Error adding item to ${listName}:`, error);
     }
   };
 
@@ -108,16 +117,18 @@ function ListManager({ updateLists, search, showSnack }) {
 
   const handleEditItem = async () => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       const updatedData = { ...lists };
       const { listName, newValue, itemIndex } = editItem;
           // Обновление массива
         updatedData[listName][itemIndex] = newValue;
       await axios.put(`http://localhost:5000/lists/`, updatedData);
-      showSnack(`${newValue} edited in ${listName}`);
+      showSnack(`"${newValue}" edited in "${listName}"`);
       setTimeout(() => {
         fetchLists();
       }, 1000);
+      setLoading(false);
     } catch (error) {
       // showSnack(error.data.message);
       console.error(`Error editing item in ${editItem.listName}:`, error);
@@ -127,6 +138,7 @@ function ListManager({ updateLists, search, showSnack }) {
     // Метод удаления элемента из массива
     const handleDeleteItem = async () => {
       try {
+        setLoading(true);
         addTokenToHeaders();
         const { listName, itemIndex } = editItem;
         // console.log("Метод удаления элемента",listName,itemIndex)
@@ -142,6 +154,7 @@ function ListManager({ updateLists, search, showSnack }) {
             fetchLists();
           }, 1000);
         }
+        setLoading(false);
       } catch (error) {
         // Обработка ошибки
         console.error(`Error deleting item from ${editItem.listName}:`, error);
@@ -210,8 +223,8 @@ function ListManager({ updateLists, search, showSnack }) {
           onChange={handleNewChange(editItem.listName)}
           label={`New value in ${editItem.listName}`}
         />
-          <IconButton>
-            <ControlPointIcon  onClick={handleAddItem(editItem.listName)}/>
+          <IconButton title="Add item">
+            <ControlPointIcon onClick={handleAddItem(editItem.listName)}/>
           </IconButton>
         {/* <Button title="Add item" onClick={handleAddItem(editItem.listName)}>Add Item</Button> */}
         </FormControl>
@@ -223,13 +236,13 @@ function ListManager({ updateLists, search, showSnack }) {
           onChange={handleEditChange}
           label={`Edit value item ${editItem.listName}`}
         />
-          <IconButton>
+          <IconButton title="Edit item">
             <EditRoundedIcon onClick={handleEditItem}/>
           </IconButton>
         </FormControl>
 
           <IconButton sx={{ m: 1, ml: 6 }} size="large"
-          title="Delete item" onClick={()=>{setDelOpen(true)}}>
+            title="Delete item" onClick={()=>{setDelOpen(true)}}>
             <DeleteIcon />
           </IconButton>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -28,7 +29,19 @@ import AddEventModal from "./modals/addEventModal"
 import EditEnventModal from "./modals/editEventModal"
 import DeleteEventModal from "./modals/deleteEventModal"
 import axios from "axios";
-import { addTokenToHeaders } from "../Service/AuthUser";
+import { addTokenToHeaders } from "../service/AuthUser";
+
+const StyledFab = styled(Fab)({
+  position: 'absolute',
+  zIndex: 1,
+  top: 9,
+  left: "20%",
+  right: 0,
+  margin: '0 auto',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
+});
 
 
 function TablePaginationActions(props) {
@@ -93,7 +106,7 @@ TablePaginationActions.propTypes = {
 };
 
 
-const EventTable = (({ showSnack, search, updateEvents }) => {
+const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag }) => {
   // console.log(search);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -122,10 +135,6 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
     setAddOpen(false);
   };
 
-  //отображение GET
-  useEffect(() => {
-    fetchEvents();
-  }, []);
 
   //функция поиска
   useEffect(() => {
@@ -138,23 +147,31 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
     }
   }, [events, search]);
 
-
+    //отображение GET
   const fetchEvents = async () => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       const response = await axios.get(`http://localhost:5000/events`);
       let fetchedEvents = response.data;
       // console.log("EventItem:", fetchedEvents)
       setEvents(fetchedEvents);
-      updateEvents(fetchedEvents)
+      updateEvents(fetchedEvents);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching events:", error);
     }
   };
 
+  useEffect(() => {
+    fetchEvents();
+  }, [refreshFlag]);
+
+
   //добавление event
   const handleAddEvent = async (eventData) => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       // console.log(eventData);
       // const formData = new FormData();
@@ -173,8 +190,9 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
       showSnack(response.data.message);
       setTimeout(() => {
         fetchEvents();
-      }, 3000);
+      }, 2000);
       // console.log("Event created:", response.data.message);
+      setLoading(false);
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data;
@@ -202,12 +220,14 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
 
     const handleEditEvent = async (eventData) => {
       try {
+        setLoading(true);
         addTokenToHeaders();
         await axios.put(`http://localhost:5000/events/?_id=${selectedEvent._id}`, eventData);
         setTimeout(() => {
           fetchEvents();
-        }, 3000);
+        }, 2000);
         closeEditModal();
+        setLoading(false);
       } catch (error) {
         console.error("Error updating event:", error);
       }
@@ -223,10 +243,12 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
     //метод удаления delete
     const handleDeleteEvent = async () => {
       try {
+        setLoading(true);
         addTokenToHeaders();
         await axios.delete(`http://localhost:5000/events/${selectedEvent}`);
         setDelOpen(false);
         fetchEvents();
+        setLoading(false);
       } catch (error) {
         console.error("Error delete event:", error);
       }
@@ -240,7 +262,7 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
   const formatDate = (dateTimeString) => {
     const options = {
       year: "numeric",
-      month: "long",
+      month: "numeric",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -256,10 +278,10 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
   return (
     <>
       <TableContainer component={Paper}>
-        <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-          <Fab size="small" color="secondary" aria-label="add">
+        <Stack direction="row" spacing={2}>
+          <StyledFab title="add event" size="small" color="secondary">
             <AddIcon onClick={() => setAddOpen(true)}/>
-          </Fab>
+          </StyledFab>
           {/* <Button
             variant="outlined"
             fullWidth
@@ -270,7 +292,7 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
             Add event
           </Button> */}
         </Stack>
-        <Table sx={{ minWidth: 500 }} aria-label="event pagination table">
+        <Table sx={{ minWidth: 500, backgroundColor: 'grey.300' }} aria-label="event pagination table">
           <TableHead>
             <TableRow>
               <TableCell>Image</TableCell>
@@ -278,6 +300,7 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
               <TableCell>Event description</TableCell>
               <TableCell align="right">Start Date&Time</TableCell>
               <TableCell align="right">Adress</TableCell>
+              <TableCell align="right">Status</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -290,8 +313,8 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
                     {event.image && (
                       <img
                         src={event.image}
-                        alt="Event"
-                        width="50"
+                        alt="Event image"
+                        width="70"
                         height="50"
                       />
                     )}
@@ -307,6 +330,11 @@ const EventTable = (({ showSnack, search, updateEvents }) => {
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
                     {event.adress}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    <span style={{ color: event.used ? 'red' : 'green' }}>
+                      {event.used ? 'Used' : 'New'}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Edit">
