@@ -4,7 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 const EditModal = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-
+  
   useEffect(() => {
     if (selectedUser) {
       setUsername(selectedUser.username || ""); // Установка значения username

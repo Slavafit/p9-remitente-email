@@ -127,6 +127,8 @@ function Home() {
           <AccordionDetails>
               <Remitente
                 contacts={contacts}
+                events={events}
+                showSnack={handleShowSnack}
               />
           </AccordionDetails>
         </Accordion>

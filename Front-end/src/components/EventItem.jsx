@@ -19,10 +19,8 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import AddEventModal from "./modals/addEventModal"
@@ -30,6 +28,7 @@ import EditEnventModal from "./modals/editEventModal"
 import DeleteEventModal from "./modals/deleteEventModal"
 import axios from "axios";
 import { addTokenToHeaders } from "../service/AuthUser";
+import ImageModal from "./modals/imageModal";
 
 const StyledFab = styled(Fab)({
   position: 'absolute',
@@ -116,6 +115,8 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
   const [isDelOpen, setDelOpen] = React.useState(false);  //окно удаления
   const [selectedEvent, setSelectedEvent] = useState(null); //выбраное событие
   const [filtered, setFiltered] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState('');
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -133,6 +134,15 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     //закрытие модального окна
   const closeAddModal = () => {
     setAddOpen(false);
+  };
+  //модальное окно открытия увеличения фото
+  const handleImageClick = (imageUrl) => {
+    setModalImage(imageUrl);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
   };
 
 
@@ -195,10 +205,10 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       setLoading(false);
     } catch (error) {
       if (error.response) {
-        const errorMessage = error.response.data;
-        showSnack(errorMessage.message)
-        // console.log(errorMessage.message)
+        const errorMessage = error.response.data.error;
+        showSnack(errorMessage);
         console.error("Error create event:", error);
+        setLoading(false);
       } else {
         console.error("Network error:", error);
       }
@@ -222,7 +232,12 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       try {
         setLoading(true);
         addTokenToHeaders();
-        await axios.put(`http://localhost:5000/events/?_id=${selectedEvent._id}`, eventData);
+        const response = await axios.put(
+          `http://localhost:5000/events/?_id=${selectedEvent._id}`, 
+          eventData);
+          let message = response.data.name;
+        showSnack(`Event "${message}" was edited successfully`)
+          console.log(response.data);
         setTimeout(() => {
           fetchEvents();
         }, 2000);
@@ -245,7 +260,10 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       try {
         setLoading(true);
         addTokenToHeaders();
-        await axios.delete(`http://localhost:5000/events/${selectedEvent}`);
+        const response = await axios.delete(`
+        http://localhost:5000/events/${selectedEvent}`);
+        // let message = response.data.name;
+        console.log(response.data);
         setDelOpen(false);
         fetchEvents();
         setLoading(false);
@@ -269,7 +287,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     };
 
     const dateTime = new Date(dateTimeString);
-    return dateTime.toLocaleString("en-GB", options);
+    return dateTime.toLocaleString("DE", options);
   };
 
 
@@ -282,15 +300,6 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
           <StyledFab title="add event" size="small" color="secondary">
             <AddIcon onClick={() => setAddOpen(true)}/>
           </StyledFab>
-          {/* <Button
-            variant="outlined"
-            fullWidth
-            
-            onClick={() => setAddOpen(true)}
-            startIcon={<AddCircleOutlineIcon />}
-          >
-            Add event
-          </Button> */}
         </Stack>
         <Table sx={{ minWidth: 500, backgroundColor: 'grey.300' }} aria-label="event pagination table">
           <TableHead>
@@ -309,16 +318,18 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((event) => (
                 <TableRow key={event._id}>
-                    <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row">
                     {event.image && (
                       <img
                         src={event.image}
                         alt="Event image"
                         width="70"
                         height="50"
+                        onClick={() => handleImageClick(event.image)}
+                        style={{ cursor: 'pointer' }}
                       />
                     )}
-                    </TableCell>
+                  </TableCell>
                   <TableCell component="th" scope="row">
                     {event.name}
                   </TableCell>
@@ -396,6 +407,11 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
           deleteOpen={isDelOpen}
           handleClose={()=>{setDelOpen(false)}}
           onDelete={handleDeleteEvent}
+        />
+        <ImageModal
+          modalOpen={modalOpen}
+          imageUrl={modalImage}
+          handleClose={handleCloseModal}
         />
       </TableContainer>
     </>

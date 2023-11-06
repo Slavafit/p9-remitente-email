@@ -11,7 +11,6 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
-import 'dayjs/locale/en-gb';
 import dayjs from 'dayjs';
 
 const AddEventModal = ({ open, onSubmit, close }) => {
@@ -65,63 +64,68 @@ const AddEventModal = ({ open, onSubmit, close }) => {
 
   return (
     <Dialog open={open} onClose={close}>
-      <DialogTitle>Add Event</DialogTitle>
-        <DialogContent
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'left',
-            gap: '20px',
-            }}
-          >
-          <DialogContentText>Fill in the fields for the new event:</DialogContentText>
-          <TextField
-            required
-            label="Event Name"
-            name="name"
-            type="Text"
-            value={eventData.name}
-            onChange={handleInputChange}
-          />
-          <TextField
-            label="Event description"
-            name="description"
-            type="Textarea"
-            value={eventData.description}
-            onChange={handleInputChange}
-          />
-          <TextField
-            required
-            label="Event Image"
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <DesktopDateTimePicker
-              label="Start Date and Time"
-              value={eventData.startDate}
-              defaultValue={dayjs('2023-10-30T15:30')}
-              onChange={(newDate) => handleDateTimeChange(newDate, 'startDate')}
-              renderInput={(params) => <TextField {...params} />}
-              />
-          </LocalizationProvider>
-          <TextField
-            label="Event adress"
-            name="adress"
-            type="Text"
-            value={eventData.adress}
-            onChange={handleInputChange}
-          />
-        </DialogContent>
-      <DialogActions>
-        <Button onClick={close} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleAddClick} color="primary">
-          Add
-        </Button>
-      </DialogActions>
+      <DialogContent sx={{padding: 3, backgroundColor: 'grey.300'}}>
+        <DialogTitle>Add Event</DialogTitle>
+          <DialogContent
+            sx={{
+              padding: 3,
+              borderRadius: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'left',
+              gap: '20px',
+              bgcolor: "Menu",
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'
+              }}
+            >
+            <DialogContentText sx={{mt:1}}>Fill in the fields for the new event:</DialogContentText>
+            <TextField
+              required
+              label="Event Name"
+              name="name"
+              type="Text"
+              value={eventData.name}
+              onChange={handleInputChange}
+            />
+            <TextField
+              label="Event description"
+              name="description"
+              type="Textarea"
+              value={eventData.description}
+              onChange={handleInputChange}
+            />
+            <TextField
+              required
+              label="Event Image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="DE">
+              <DesktopDateTimePicker
+                label="Start Date and Time"
+                value={eventData.startDate}
+                onChange={(newDate) => handleDateTimeChange(newDate, 'startDate')}
+                renderInput={(params) => <TextField {...params} />}
+                />
+            </LocalizationProvider>
+            <TextField
+              label="Event adress"
+              name="adress"
+              type="Text"
+              value={eventData.adress}
+              onChange={handleInputChange}
+            />
+          </DialogContent>
+        <DialogActions sx={{mt:1}}>
+          <Button onClick={close} variant="outlined" color="success" >
+            Cancel
+          </Button>
+          <Button onClick={handleAddClick} variant="outlined" color="success">
+            Add
+          </Button>
+        </DialogActions>
+      </DialogContent>
     </Dialog>
   );
 };

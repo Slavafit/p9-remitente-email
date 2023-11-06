@@ -26,7 +26,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
   const [filteredContacts, setFilteredContacts] = useState([]);
 
 
-// console.log("MailManager", mailLists);
+// console.log("MailManager", events);
 
 
   const handleChange = (event) => {
@@ -87,6 +87,57 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
       }
     }, [selectedEventId, mailLists]);
 
+    const getContactStatus = (contact) => {
+      const list = mailLists.find((list) =>
+        list.entries.some((entry) => entry.contact === contact._id)
+      );
+    
+      if (list) {
+        const contactEntry = list.entries.find(entry => entry.contact === contact._id);
+    
+        if (contactEntry) {
+          return (
+            <div>
+              <span style={{ color: contactEntry.isSent ? 'green' : 'red' }}>
+                {contactEntry.isSent ? 'Enviada' : 'No enviada'}
+              </span>
+            </div>
+          );
+        }
+      }
+      return null;
+    };
+
+    const getResponse = (contact) => {
+      const list = mailLists.find((list) =>
+        list.entries.some((entry) => entry.contact === contact._id)
+      );
+    
+      if (list) {
+        const contactEntry = list.entries.find(entry => entry.contact === contact._id);
+    
+        if (contactEntry) {
+          let color;
+          if (contactEntry.response === 'Voy') {
+            color = 'green';
+          } else if (contactEntry.response === 'No puedo') {
+            color = 'red';
+          } else {
+            color = 'gray';
+          }
+    
+          return (
+            <div>
+              <span style={{ color: color }}>
+                {contactEntry.response || 'Vacío'}
+              </span>
+            </div>
+          );
+        }
+      }
+      return null;
+    };
+
 
   return (
     <Box>
@@ -122,12 +173,11 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
               <TableCell align="right">Categoria</TableCell>
               <TableCell align="right">Provincia</TableCell>
               <TableCell align="right">Territorio</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Response</TableCell>
+              <TableCell align="right">Estado</TableCell>
+              <TableCell align="right">Respuesta</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-          {/* {filteredContacts && filteredContacts.length > 0 && filteredContacts.map((contact) => ( */}
           {filteredContacts.map((contact, index) => (
                 <TableRow key={index}>
                   <TableCell>{contact ? contact.nombre : '-'}</TableCell>
@@ -137,45 +187,12 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
                   <TableCell align="right">{contact ? contact.provincia : '-'}</TableCell>
                   <TableCell align="right">{contact ? contact.territorio : '-'}</TableCell>
                   <TableCell align="right">
-                    {mailLists
-                      .filter((list) =>
-                        list.entries.some((entry) => entry.contact === contact._id)
-                      )
-                      .map((list) =>
-                        list.entries
-                          .filter((entry) => entry.contact === contact._id)
-                          .map((entry, index) => (
-                            <div key={index}>
-                              <span style={{ color: entry.isSent ? 'green' : 'red' }}>
-                                {entry.isSent ? 'Enviada' : 'No enviada'}
-                              </span>
-                            </div>
-                          ))
-                      )}
+                    {getContactStatus(contact)}
                   </TableCell>
                   <TableCell align="right">
-                    {mailLists
-                      .filter((list) =>
-                        list.entries.some((entry) => entry.contact === contact._id)
-                      )
-                      .map((list) =>
-                        list.entries
-                          .filter((entry) => entry.contact === contact._id)
-                          .map((entry, index) => (
-                            <div key={index}>
-                              {entry.response === 'Voy' ? (
-                                <span style={{ color: 'green' }}>{entry.response}</span>
-                              ) : entry.response === 'No puedo' ? (
-                                <span style={{ color: 'red' }}>{entry.response}</span>
-                              ) : entry.response ? (
-                                <span>{entry.response}</span>
-                              ) : (
-                                <span style={{ color: 'gray' }}>Vacío</span>
-                              )}
-                            </div>
-                          ))
-                      )}
+                    {getResponse(contact)}
                   </TableCell>
+
               </TableRow>
             ))}
           </TableBody>

@@ -14,35 +14,26 @@ import { Select, MenuItem, TextField, Button, FormControl,
    Checkbox,} from '@mui/material';
 import axios from 'axios';
 import Stack from '@mui/material/Stack';
-import { addTokenToHeaders } from "../Service/AuthUser";
+import { addTokenToHeaders } from "../service/AuthUser";
 
 
 
 
-const MailManager = ({ events, contacts, showSnack, search }) => {
+const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshFlag }) => {
   const [eventName, setEventName] = React.useState([]);
-  const [selectedEvent, setSelectedEvent] = useState('');
-  const [selectedEvents, setSelectedEvents] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [mailLists, setMailList] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState('');
+  const [filteredContacts, setFilteredContacts] = useState([]);
 
 
 // console.log("MailManager", mailLists);
 
 
   const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-
-    if (eventName.length > 0) {
-      setEventName([value]);
-    } else {
-      setEventName(
-        typeof value === 'string' ? value.split(',') : value
-      );
-    }
+    setSelectedEventId(event.target.value);
   };
+
+
 
   const handleKeyDown = (e) => {
     if (isFocused && e.key.length === 1) {
@@ -56,95 +47,73 @@ const MailManager = ({ events, contacts, showSnack, search }) => {
   };
   
 
-
   //отображение GET
-  useEffect(() => {
-    fetchMailLists();
-  }, []);
-
-
   const fetchMailLists = async () => {
     try {
+      setLoading(true);
       addTokenToHeaders();
       const response = await axios.get(`http://localhost:5000/maillists`);
       let fetchedData = response.data;
-      console.log("EventItem:", fetchedData)
       setMailList(fetchedData);
+      setLoading(false);
     } catch (error) {
       showSnack(error.data.message);
       console.error("Error fetching MailLists:", error);
     }
   };
+  
+  useEffect(() => {
+    fetchMailLists();
+  }, [refreshFlag]);
 
 
-
-  const handleSendMessage = async () => {
-    // Формирование объекта для отправки
-    const messageEntries = filtered.map((contact) => ({
-      contact: contact._id,
-    }));
-
-    const messageData = {
-      event: selectedEvent, // Выбранное событие
-      entries: messageEntries, // Сформированный список сообщений
-    };
-
-    try {
-      addTokenToHeaders();
-      console.log("data to server",messageData);
-      const response = await axios.post('http://localhost:5000//maillists/', messageData);
-      console.log('Message sent:', response.data);
-    } catch (error) {
-      showSnack(error.data.message);
-      console.error('Error saving mail status:', error);
-    }
-  };
-
-
-
-  // Функция поиска события по его ID
-  const findEventById = (eventId) => {
-    return events.find((event) => event._id === eventId);
-  };
 
       // Функция поиска контакта по его ID
   const findContactById = (contactId) => {
     return contacts.find((contact) => contact._id === contactId);
   };
 
-  // только тех событий, у которых used имеет значение true
-  const filteredEvents = events.filter((event) => event.used === true);
-  
+    useEffect(() => {
+      const selectedMail = mailLists.find((mail) => mail.event === selectedEventId);
+      // console.log("selectedMail",selectedMail);
+      // console.log("filteredContacts",filteredContacts);
+      if (selectedMail) {
+        //ищу все контакты по id из entries
+        const contactsFromMail = selectedMail.entries.map((entry) => findContactById(entry.contact));
+
+        setFilteredContacts(contactsFromMail);
+      } else {
+        setFilteredContacts([]);
+      }
+    }, [selectedEventId, mailLists]);
+
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
       <FormControl sx={{ m: 1, width: 200 }}>
         <InputLabel id="event-name">Event</InputLabel>
         <Select
           labelId="event-name"
-          value={eventName}
+          value={selectedEventId}
           onChange={handleChange}
           input={<OutlinedInput label="Event" />}
           onKeyDown={handleKeyDown}
           autoFocus
           >
-          {filteredEvents.map((event) => (
-            <MenuItem
-              key={event._id}
-              value={event.name}
-            >
-              {event.name}
-            </MenuItem>
-          ))}
+            {mailLists && mailLists.length > 0 && mailLists.map((event) => {
+              const foundEvent = events.find((e) => e._id === event.event);
+              return (
+                <MenuItem key={event._id} value={event.event}>
+                  {foundEvent ? foundEvent.name : ''}
+                </MenuItem>
+              );
+            })}
         </Select>
       </FormControl>
-      <Button variant="contained" onClick={handleSendMessage}>
-        Send Message
-      </Button>
       <TableContainer component={Paper}>
-        <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+        <Stack direction="row" spacing={2} >
         </Stack>
-        <Table sx={{ minWidth: 500, backgroundColor: 'grey.200' }} aria-label="contact pagination table">
+        <Table sx={{ minWidth: '100%', backgroundColor: 'grey.300' }} aria-label="contact pagination table">
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
@@ -153,31 +122,63 @@ const MailManager = ({ events, contacts, showSnack, search }) => {
               <TableCell align="right">Categoria</TableCell>
               <TableCell align="right">Provincia</TableCell>
               <TableCell align="right">Territorio</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Response</TableCell>
+              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Response</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-          {mailLists.map((mail) => (
-             mail.entries.map((entry) => {
-              const contact = findContactById(entry.contact);
-              return (
-                <TableRow key={entry._id}>
+          {filteredContacts.map((contact, index) => (
+                <TableRow key={index}>
                   <TableCell>{contact ? contact.nombre : '-'}</TableCell>
-                  <TableCell>{contact ? contact.cargo : '-'}</TableCell>
-                  <TableCell>{contact ? contact.entidad : '-'}</TableCell>
-                  <TableCell>{contact ? contact.categoria : '-'}</TableCell>
-                  <TableCell>{contact ? contact.provincia : '-'}</TableCell>
-                  <TableCell>{contact ? contact.territorio : '-'}</TableCell>
-                  <TableCell>
-                      {entry.status}
-                    </TableCell>
-                  <TableCell>
-                    {entry.response}
-                    </TableCell>
-                </TableRow>
-                );
-              })
+                  <TableCell align="right">{contact ? contact.cargo : '-'}</TableCell>
+                  <TableCell align="right">{contact ? contact.entidad : '-'}</TableCell>
+                  <TableCell align="right">{contact ? contact.categoria : '-'}</TableCell>
+                  <TableCell align="right">{contact ? contact.provincia : '-'}</TableCell>
+                  <TableCell align="right">{contact ? contact.territorio : '-'}</TableCell>
+                  <TableCell align="right">
+                    {mailLists
+                      .filter((list) =>
+                        list.entries.some((entry) => entry.contact === contact._id)
+                      )
+                      .map((list) => {
+                        const contactEntry = list.entries.find(entry => entry.contact === contact._id);
+
+                        if (contactEntry) {
+                          return (
+                            <div key={contactEntry._id}>
+                              <span style={{ color: contactEntry.isSent ? 'green' : 'red' }}>
+                                {contactEntry.isSent ? 'Enviada' : 'No enviada'}
+                              </span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                  </TableCell>
+                  <TableCell align="right">
+                    {mailLists
+                      .filter((list) =>
+                        list.entries.some((entry) => entry.contact === contact._id)
+                      )
+                      .map((list) =>
+                        list.entries
+                          .filter((entry) => entry.contact === contact._id)
+                          .map((entry, index) => (
+                            <div key={index}>
+                              {entry.response === 'Voy' ? (
+                                <span style={{ color: 'green' }}>{entry.response}</span>
+                              ) : entry.response === 'No puedo' ? (
+                                <span style={{ color: 'red' }}>{entry.response}</span>
+                              ) : entry.response ? (
+                                <span>{entry.response}</span>
+                              ) : (
+                                <span style={{ color: 'gray' }}>Vacío</span>
+                              )}
+                            </div>
+                          ))
+                      )}
+                  </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>

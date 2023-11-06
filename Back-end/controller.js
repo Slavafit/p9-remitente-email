@@ -182,26 +182,55 @@ class controller {
 
 
     // Обработчик создания записи в MailList
+    // async createMailList(req, res) {
+    //     try {
+    //         const mailListData = req.body; // Данные из тела запроса
+    //         const { event, entries } = mailListData;
+        
+    //         // Создаем новую запись для модели MailList
+    //         const mailList = new MailListModel({ event, entries });
+
+    //         // Обновляем флаг `used` в событии
+    //         await EventModel.findByIdAndUpdate(event, { used: true });
+        
+    //         // Сохраняем запись в базу данных
+    //         await Promise.all([mailList.save()]);
+        
+    //         res.status(201).json({ message: 'MailList created successfully' });
+    //     } catch (e) {
+    //         console.error(e);
+    //         res.status(500).json({ error: 'createMailList error', message: e.message });
+    //     }
+    // }
     async createMailList(req, res) {
         try {
-            const mailListData = req.body; // Данные из тела запроса
-            const { event, entries } = mailListData;
-        
-            // Создаем новую запись для модели MailList
-            const mailList = new MailListModel({ event, entries });
+          const { eventId, contacts } = req.body;
+          const eventName = req.body.eventName; // Название события для уведомления
 
-            // Обновляем флаг `used` в событии
-            await EventModel.findByIdAndUpdate(event, { used: true });
-        
-            // Сохраняем запись в базу данных
-            await Promise.all([mailList.save()]);
-        
-            res.status(201).json({ message: 'MailList created successfully' });
-        } catch (e) {
-            console.error(e);
-            res.status(500).json({ error: 'createMailList error', message: e.message });
+          const eventExists = await MailListModel.findOne({event: eventId}); // Проверка на существующее событие
+        //   console.log("name",eventName,"id:",eventId);
+          if (eventExists) {
+            return res.status(400).json({ message: `Event already exists` });
+          }
+          console.log(contacts);
+          const entries = contacts.map(contact => ({ contact }));
+      
+          // Создаем новую запись для модели MailList с заполненными entries
+          const mailList = new MailListModel({ event: eventId, entries });
+          console.log(mailList);
+          // Обновляем флаг `used` в событии
+          await EventModel.findByIdAndUpdate(eventId, { used: true });
+      
+          // Сохраняем запись в базу данных
+          await mailList.save();
+      
+          res.status(201).json({ message: `MailList with event "${eventName}" created successfully` });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'createMailList error', message: error.message });
         }
-    }
+    };
+      
     // Обработчик обновления записи MailList
     async updateMailList(req, res) {
         try {

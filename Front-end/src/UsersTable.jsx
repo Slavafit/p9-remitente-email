@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import EditModal from "./components/modals/editUserModal";
 import DeleteUserModal from "./components/modals/deleteUserModal"
@@ -22,10 +23,10 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
 const columns = [
-  { id: 'username', label: 'Username', minWidth: 200 },
-  { id: 'email', label: 'Email', minWidth: 200 },
-  { id: 'roles', label: 'Roles', minWidth: 270, },
-  { id: 'actions', label: 'Actions', minWidth: 250, },
+  { id: 'username', label: 'Username' },
+  { id: 'email', label: 'Email',  },
+  { id: 'roles', label: 'Roles', minWidth: 200 },
+  { id: 'actions', label: 'Actions', align: "left" },
 ];
 
 
@@ -122,6 +123,7 @@ export default function UsersTable( {showSnack, open, close} ) {
   return (
     <>
       <Dialog open={open} onClose={close}>
+      <DialogTitle>Users</DialogTitle>
         <DialogContent sx={{height: 'auto', width: '100%', padding: 3, backgroundColor: 'grey.100'}}>
           <Paper sx={{boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)', backgroundColor: 'grey.300'}}>
             <TableContainer>
@@ -154,7 +156,7 @@ export default function UsersTable( {showSnack, open, close} ) {
                               </TableCell>
                             );
                           })}
-                            <TableCell key="actions" align="right">
+                            <TableCell>
                               <IconButton onClick={() => handleEditUser(row)}>
                                 <EditRoundedIcon />
                               </IconButton>

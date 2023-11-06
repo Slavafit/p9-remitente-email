@@ -20,8 +20,9 @@ import DeleteUserModal from "./components/modals/deleteUserModal";
 const ProfilePage = ( {showSnack, open, close} ) => {
   const [users, setUsers] = useState(true);
   let username = localStorage.getItem('username');
-  const [editOpen, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // console.log("personal: ", username);
   useEffect(() => {
@@ -55,7 +56,12 @@ const ProfilePage = ( {showSnack, open, close} ) => {
 
   
     //метод редактирования
-    const handleEditUser = async (newUsername, newEmail) => {
+
+    const handleEditUser = (user) => {
+      setSelectedUser(user);
+      setEditOpen(true);
+    };
+    const editUser = async (newUsername, newEmail) => {
       try {
         const id = users._id
         const userData = {
@@ -68,7 +74,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         setUsers(response.data);
         let username = response.data.username;
         localStorage.setItem('username', username);
-        setOpen(false)
+        setEditOpen(false)
         showSnack(`User ${username} updated successfully` );
       } catch (error) {
         console.error("Error updating user:", error);
@@ -112,7 +118,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
                 {users.email}
               </Typography>
               <Box>
-                <IconButton onClick={() => setOpen(true)}>
+                <IconButton onClick={() => handleEditUser(users)}>
                   <EditRoundedIcon />
                 </IconButton>
                 <IconButton onClick={() => setDeleteOpen(true)}>
@@ -133,10 +139,9 @@ const ProfilePage = ( {showSnack, open, close} ) => {
       </Dialog>
         <EditModal
         editOpen={editOpen}
-        handleClose={() => setOpen(false)}
-        onSubmit={handleEditUser}
-        initialUsername={users.username || ""}
-        initialEmail={users.email || ""}
+        handleClose={() => setEditOpen(false)}
+        onSubmit={editUser}
+        selectedUser={selectedUser}
         />
         <DeleteUserModal
         deleteOpen={deleteOpen}
