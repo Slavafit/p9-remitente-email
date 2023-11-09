@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" type="image/png" href="./src/assets/donbosco_logo.png"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remitente</title>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <div id="root">`
+      <h2>Hola, ${contactInfo.username}! Nos gustaría informarle de que está invitado a una reunión.</h2>
+      <img src="${eventInfo.image}" alt="Evento" style="width: 150px; height: auto; margin-bottom: 10px;">
+      <p>Evento: ${eventName}</p>
+      <p>Descripción del evento: ${eventInfo.description}</p>
+      <i>Información:</i>
+      <ul>
+          <li>Fecha y hora: ${eventInfo.startDate}</li>
+          <li>Localización: ${eventInfo.adress}</li>
+      </ul>
+      <p>Un saludo</p>
+      <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.</p>
+      <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
+      <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+      <button onclick="sendResponse('Voy')">Si, voy.</button>
+
+    </div>
+    <script>
+      function sendResponse(response) {
+          fetch("http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy")
+              .then(response => {
+                  if (response.ok) {
+                      // Здесь можно обработать успешный ответ от сервера
+                      alert('Ответ успешно отправлен!');
+                  } else {
+                      // Обработка других статусов ответа
+                  }
+              })
+              .catch(error => console.error('Ошибка:', error));
+      }
+      </script>
+  </body>
+</html>

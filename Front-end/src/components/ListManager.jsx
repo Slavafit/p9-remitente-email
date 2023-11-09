@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Box, OutlinedInput, InputLabel, MenuItem, FormControl, Select, Paper, TextField, Button, IconButton } from '@mui/material';
+import Box from '@mui/material/Box';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
 import _ from 'lodash';
 import axios from 'axios';
 import { addTokenToHeaders } from "../service/AuthUser";
@@ -84,17 +92,20 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
       };
       // console.log("post-patch",listName)
       const response = await axios.patch(`http://localhost:5000/lists/`,updatedList);
-      // console.log(response.data);
-      if (response.status === 200) {
-        showSnack(`"${newItems[listName]}" added in "${listName}" successfully`);
-        setTimeout(() => {
-          fetchLists();
-        }, 1000);
-      }
-      setLoading(false);
+      let responseData = response.data.message;
+      showSnack('success', responseData);
     } catch (error) {
-        showSnack(error.data.message);
+      if ( error.response.data && error.response.data.message) {
+        const resError = error.response.data.message;
+        // showSnack(resError);
+        showSnack('warning', resError);
+    } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+        const resError = error.response.data.errors[0].message;
+        showSnack('warning', resError);
+    } else {
         console.error(`Error adding item to ${listName}:`, error);
+        showSnack('warning', 'Error post MailList');
+      }
     }
   };
 

@@ -1,15 +1,22 @@
 import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
+import AlertTitle from '@mui/material/AlertTitle';
 import Alert from '@mui/material/Alert';
-import MuiAlert from '@mui/material/Alert';
+import { useTheme } from '@mui/material/styles';
 
 
-// const Alert = React.forwardRef(function Alert(props, ref) {
-//     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-//   });
+
+  export default function Snack({ snackOpen, handleClose, title, message }) {
+    const theme = useTheme();
+
+    let severity = 'success';
+    if (title === 'warning') {
+      severity = 'warning';
+    } else if (title === 'error') {
+      severity = 'error';
+    }
 
 
-  export default function Snack({ snackOpen, handleClose, message }) {
     return(
         <Stack spacing={2} sx={{ width: '100%' }}>
             <Snackbar 
@@ -17,8 +24,9 @@ import MuiAlert from '@mui/material/Alert';
                 onClose={handleClose}
                 autoHideDuration={6000}
                  >
-                <Alert severity="warning" variant="filled">
-                    {message}
+                <Alert severity={severity} variant="filled">
+                    <AlertTitle>{title}</AlertTitle>
+                        {message}
                 </Alert>
             </Snackbar>
         </Stack>

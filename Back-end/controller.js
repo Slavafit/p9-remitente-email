@@ -204,30 +204,195 @@ class controller {
     // }
     async createMailList(req, res) {
         try {
-          const { eventId, contacts } = req.body;
-          const eventName = req.body.eventName; // Название события для уведомления
+            const { eventId, contacts, eventName } = req.body;
+            const error = validationResult(req);
+            if (!error.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = error.array().map(error => ({
+            
+                  message: error.msg,
+                }));
 
-          const eventExists = await MailListModel.findOne({event: eventId}); // Проверка на существующее событие
-        //   console.log("name",eventName,"id:",eventId);
-          if (eventExists) {
-            return res.status(400).json({ message: `Event already exists` });
-          }
-          console.log(contacts);
-          const entries = contacts.map(contact => ({ contact }));
-      
-          // Создаем новую запись для модели MailList с заполненными entries
-          const mailList = new MailListModel({ event: eventId, entries });
-          console.log(mailList);
-          // Обновляем флаг `used` в событии
-          await EventModel.findByIdAndUpdate(eventId, { used: true });
-      
-          // Сохраняем запись в базу данных
-          await mailList.save();
-      
-          res.status(201).json({ message: `MailList with event "${eventName}" created successfully` });
+                return res.status(400).json({errors: errorMessages });
+            }
+
+            const eventExists = await MailListModel.findOne({event: eventId}); // Проверка на существующее событие
+                //   console.log("name",eventName,"id:",eventId);
+            if (eventExists) {
+                return res.status(400).json({ message: `Event already exists` });
+            }
+            
+            const entries = contacts.map(contact => ({ contact }));
+        
+            // Создаем новую запись для модели MailList с заполненными entries
+            const mailList = new MailListModel({ event: eventId, entries });
+
+            // Обновляем флаг `used` в событии
+            // await EventModel.findByIdAndUpdate(eventId, { used: true });
+        
+            // Сохраняем запись в базу данных
+            // await mailList.save();
+                
+            // Отправляем сообщения электронной почты
+            for (const contact of contacts) {
+                const contactInfo = await ContactModel.findById(contact);
+                const eventInfo = await EventModel.findById(eventId);
+                const startDate = new Date(eventInfo.startDate);
+                const formattedDate = startDate.toLocaleString();
+
+                if (contactInfo) {
+                    const mailMessage = {
+                        from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
+                        to: contactInfo.email,
+                        subject: `Invitación a "${eventName}"`,
+                        
+                        html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                        <title>Invitación a "${eventName}"</title>
+                        </head>
+                        <body>
+                        <h2>Estimido/a, ${contactInfo.nombre}! Nos gustaría informarle de que está invitado a una reunión.</h2>
+
+                        <img src="${eventInfo.image}" alt="Evento" style="width: 200px; height: auto; margin-bottom: 10px;">
+                        <p>Evento: ${eventName}</p>
+                        <p>Descripción del evento: ${eventInfo.description}</p>
+                        <i>información:</i>
+                            <ul>
+                                <li>Fecha y hora: ${formattedDate}</li>
+                                <li>Localización: ${eventInfo.adress}</li>
+                            </ul>
+                        <p>Un saludo</p>
+
+                        <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
+                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
+                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+                        <button onclick="sendResponse('Voy')">Si, voy.</button>
+                        <script>
+                        function sendResponse(response) {
+                            fetch(http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy)
+                                .then(response => {
+                                    if (response.ok) {
+                                        // Здесь можно обработать успешный ответ от сервера
+                                        alert('Ответ успешно отправлен!');
+                                    } else {
+                                        // Обработка других статусов ответа
+                                    }
+                                })
+                                .catch(error => console.error('Ошибка:', error));
+                        }
+                        </script>
+                        </body>
+                        </html>
+                        `,
+                    };
+                    mailer(mailMessage);
+
+                    // Обновление флага isSent в MailList
+                    await MailListModel.findOneAndUpdate(
+                        { event: eventId, 'entries.contact': contact },
+                        { $set: { 'entries.$.isSent': true } }
+                    );
+                }
+            }
+            res.status(201).json({ message: `MailList with event "${eventName}" created successfully` });
         } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: 'createMailList error', message: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'createMailList error', message: error.message });
+        }
+    };
+
+    //Обработчик добавления записей в MailList
+    async patchMailList(req, res) {
+        try {
+            const { eventId, eventName, contacts  } = req.body;
+            const error = validationResult(req);
+            if (!error.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = error.array().map(error => ({
+            
+                  message: error.msg,
+                }));
+
+                return res.status(400).json({errors: errorMessages });
+            }
+
+            const mailList = await MailListModel.findOne({ event: eventId });
+
+            if (!mailList) {
+                return res.status(404).json({ message: `MailList not found for event ${eventId}` });
+              }
+              const existingContacts = mailList.entries.map(entry => entry.contact.toString()); // Получить существующие контакты в виде строк
+
+              const newEntries = contacts
+                .filter(contactId => !existingContacts.includes(contactId)) // Отфильтровать только те, которых еще нет в entries
+                .map(contactId => ({ contact: contactId }));
+              
+              mailList.entries.push(...newEntries);
+              await mailList.save();
+            
+            // Отправляем сообщения электронной почты
+            for (const contact of contacts) {
+                const contactInfo = await ContactModel.findById(contact);
+                const eventInfo = await EventModel.findById(eventId);
+                const startDate = new Date(eventInfo.startDate);
+                const formattedDate = startDate.toLocaleString();
+
+                if (contactInfo) {
+                    const mailMessage = {
+                        from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
+                        to: contactInfo.email,
+                        subject: `Invitación a "${eventName}"`,
+                        
+                        html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                        <title>Invitación a "${eventName}"</title>
+                        </head>
+                        <body>
+                        <h2>Estimido/a, ${contactInfo.nombre}! Nos gustaría informarle de que está invitado a una reunión.</h2>
+
+                        <img src="${eventInfo.image}" alt="Evento" style="width: 200px; height: auto; margin-bottom: 10px;">
+                        <p>Evento: ${eventName}</p>
+                        <p>Descripción del evento: ${eventInfo.description}</p>
+                        <i>información:</i>
+                            <ul>
+                                <li>Fecha y hora: ${formattedDate}</li>
+                                <li>Localización: ${eventInfo.adress}</li>
+                            </ul>
+                        <p>Un saludo</p>
+
+                        <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
+                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
+                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+                        </body>
+                        </html>
+                        `,
+                    };
+                    mailer(mailMessage)
+                        .then(info => {
+                            // Обработка успешной отправки
+                            console.log('Email sent: ', info);
+                        })
+                        .catch(err => {
+                            // Обработка ошибок
+                            console.error('Error sending email: ', err);
+                        });
+
+                    // Обновление флага isSent в MailList
+                    await MailListModel.findOneAndUpdate(
+                        { event: eventId, 'entries.contact': contact },
+                        { $set: { 'entries.$.isSent': true } }
+                    );
+                }
+
+            }
+            res.status(201).json({ message: `MailList "${eventName}" actualizado correctamente` });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'createMailList error', message: error.message });
         }
     };
       
@@ -241,7 +406,7 @@ class controller {
             const updatedMailList = await MailListModel.findByIdAndUpdate(_id, { entries }, { new: true });
         
             if (!updatedMailList) {
-                return res.status(404).json({ message: 'MailList not found' });
+                return res.status(404).json({ message: 'MailList no encontrado' });
             }
         
             res.json(updatedMailList);
@@ -256,6 +421,31 @@ class controller {
             // console.log("Received getMailList");
             const maillist = await MailListModel.find()
             res.json(maillist)
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик получения ответов
+    async responseMailList(req, res) {
+        try {
+            const { eventId, contactId, response } = req.query
+            // console.log("Received responseMailList","eventId",eventId, "contactId",contactId, "response",response );
+
+            const mailList = await MailListModel.findOne({event: eventId});
+            if (!mailList) {
+                return res.status(404).json({ message: 'MailList no encontrado' });
+            }
+
+            const foundEntry = mailList.entries.find(entry => entry.contact.toString() === contactId);
+            if (foundEntry) {
+                foundEntry.response = response;
+          
+                await mailList.save();
+                return res.json({ message: 'Respuesta actualizada correctamente' });
+              } else {
+                return res.status(404).json({ message: 'Contacto no encontrado' });
+              }
         } catch (e) {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
@@ -280,9 +470,19 @@ class controller {
         try {
             const eventData = req.body; // Данные из тела запроса
             // console.log(eventData);
+            const error = validationResult(req);
+            if (!error.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = error.array().map(error => ({
+            
+                  message: error.msg,
+                }));
+
+                return res.status(400).json({errors: errorMessages });
+            }
             const candidate = await EventModel.findOne({ name: eventData.name })    //ищем данные в БД
             if (candidate) {        //если нашли вернули сообщение
-                return res.status(400).json({message: `Event ${eventData.name} already exists`})
+                return res.status(400).json({message: `Evento ${eventData.name} ya existe`})
             }
                 // Загружаем изображение в Cloudinary
             const cloudinaryResult = await cloudinary.uploader.upload(eventData.image);
@@ -296,7 +496,7 @@ class controller {
             });
 
             await event.save()   //сохраняем в БД
-            return res.json({message: `Event ${eventData.name} successfully saved`})  //вернули сообщение клиенту
+            return res.json({message: `Evento ${eventData.name} guardado correctamente`})  //вернули сообщение клиенту
         } catch (e) {
             console.log(e)
             res.status(500).json({error: 'PostEvent error', message: e.message})
@@ -310,7 +510,7 @@ class controller {
             //Заменяем  новым объектом
             const event = await EventModel.findByIdAndUpdate(_id, eventData, { new: true });
             if (!event) {
-                return res.status(400).json({ message: `Event ${eventData.name} not updated` });
+                return res.status(400).json({ message: `Evento ${eventData.name} no actualizado` });
             }
             res.json(event); // Отправьте обновленные данные event в ответе
         } catch (e) {
@@ -325,9 +525,9 @@ class controller {
         try {
             const deletedEvent = await EventModel.findByIdAndDelete(eventId);
             if (!deletedEvent) {
-              return res.status(404).json({ message: 'Event not found' });
+              return res.status(404).json({ message: 'Evento no encontrado' });
             }
-            res.json({ message: 'Event deleted successfully' });
+            res.json({ message: 'Evento borrado correctamente' });
           } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Error deleting event' });
@@ -349,10 +549,20 @@ class controller {
     async createContact(req, res) {
         try {
             const contactData = req.body; // Данные из тела запроса
+            const error = validationResult(req);
+            if (!error.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = error.array().map(error => ({
+            
+                  message: error.msg,
+                }));
+    
+                return res.status(400).json({errors: errorMessages });
+            }
             // console.log("createContact",contactData);
             const candidate = await ContactModel.findOne({ email: contactData.email })    //ищем данные в БД
             if (candidate) {        //если нашли вернули сообщение
-                return res.status(400).json({message: `Contact with ${contactData.email} already exists`})
+                return res.status(400).json({message: `Contacto con ${contactData.email} ya existe`})
             }
             const contact = new ContactModel({
                 nombre: contactData.nombre,
@@ -366,7 +576,7 @@ class controller {
             });
 
             await contact.save()   //сохраняем в БД
-            return res.json({message: `${contactData.nombre} with ${contactData.email} successfully saved`})  //вернули сообщение клиенту
+            return res.json({message: `${contactData.nombre} con ${contactData.email} guardado correctamente.`})  //вернули сообщение клиенту
         } catch (e) {
             console.log(e)
             res.status(500).json({error: 'createContact error', message: e.message})
@@ -389,7 +599,7 @@ class controller {
             //Заменяем  новым объектом
             const сontact = await ContactModel.findByIdAndUpdate(_id, сontactData, { new: true });
             if (!сontact) {
-                return res.status(400).json({ message: `Event ${сontactData.nombre} not updated` });
+                return res.status(400).json({ message: `Evento ${сontactData.nombre} no actualizado` });
             }
             res.json(сontact); // Отправьте обновленные данные event в ответе
         } catch (e) {
@@ -404,9 +614,9 @@ class controller {
         try {
             const contact = await ContactModel.findByIdAndDelete(contactId); // Используйте _id напрямую
             if (!contact) {
-                return res.status(404).json({ message: `Contact not found` });
+                return res.status(404).json({ message: `Contacto no actualizado` });
             }
-            res.json({ message: `Contact was deleted successfully` });
+            res.json({ message: `Contacto eliminado correctamente` });
         } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'Server error' });
@@ -433,13 +643,23 @@ class controller {
     async createList(req, res) {
             try {
                 const { cargo, provincia, entidad, categoria, territorio } = req.body;
-                // console.log("createList");
+                // console.log("createList",cargo);
+                const error = validationResult(req);
+                if (!error.isEmpty()) {
+                    // Если есть ошибки валидации
+                    const errorMessages = error.array().map(error => ({
+                
+                      message: error.msg,
+                    }));
+    
+                    return res.status(400).json({errors: errorMessages });
+                }
                 // Проверка переданных данных от клиента
                 const data = { cargo, provincia, entidad, categoria, territorio };
                 const validFields = Object.keys(data).filter(key => data[key]);
 
                 if (validFields.length === 0) {
-                    return res.status(400).json({ message: 'At least one field must be provided' });
+                    return res.status(400).json({ message: 'Se debe proporcionar al menos un campo' });
                 }
                 // Создаем новую запись
                 const newList = new ListModel({});
@@ -450,7 +670,7 @@ class controller {
 
                 // Сохраняем запись в базу данных
                 await newList.save();
-                res.status(201).json({ message: 'List created successfully'});
+                res.status(201).json({ message: 'Lista creada correctamente'});
             } catch (e) {
                 console.log(e)
                 res.status(500).json({error: 'PostList error', message: e.message})
@@ -476,7 +696,7 @@ class controller {
               );
           
               if (!updatedList) {
-                return res.status(404).json({ message: 'List not found' });
+                return res.status(404).json({ message: 'Lista  no encontrado' });
               }
           
               res.json(updatedList);
@@ -489,7 +709,17 @@ class controller {
     async patchList(req, res) {
         try {
         const { _id, cargo, provincia, entidad, categoria, territorio } = req.body;
-        // console.log("patchList",_id,entidad);
+        // console.log("patchList",_id,cargo);
+        const error = validationResult(req);
+        if (!error.isEmpty()) {
+            // Если есть ошибки валидации
+            const errorMessages = error.array().map(error => ({
+        
+              message: error.msg,
+            }));
+
+            return res.status(400).json({errors: errorMessages });
+        }
         const updatedFields = {};
         
         if (cargo) updatedFields.cargo = cargo;
@@ -505,10 +735,10 @@ class controller {
         );
     
         if (!updatedList) {
-            return res.status(404).json({ message: 'List not found' });
+            return res.status(404).json({ message: 'Lista no encontrado' });
         }
     
-        res.json({ message: 'successfully' });
+        res.json({ message: 'correctamente' });
         } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
@@ -535,7 +765,7 @@ class controller {
           );
       
           if (!updatedList) {
-            return res.status(404).json({ message: 'List not found' });
+            return res.status(404).json({ message: 'Lista no encontrado' });
           }
       
           res.json(updatedList);

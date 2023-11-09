@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import dayjs from 'dayjs';
-
+import 'dayjs/locale/es';
 
 
 const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip, initImage, initStartDate, initAdress }) => {
@@ -43,22 +42,12 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
       setImage(event.target.value);
     };
   
-    const handleStartDateChange = (event) => {
-      setStartDate(event.target.value);
+    const handleStartDateChange = (newDate) => {
+      setStartDate(newDate);
     };
 
-
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
-      return date.toLocaleString('DE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    };
   
+
     const handleAdressChange = (event) => {
       setAdress(event.target.value);
     };
@@ -107,16 +96,13 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
           value={image}
           onChange={handleImageChange}
         />
-        <LocalizationProvider dateAdapter={AdapterDayjs} >
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
           <DesktopDateTimePicker
             sx={{ width: '100%', margin: 1 }}
             label="New Date and Time"
-            value={formatDate(startDate)}
+            value={dayjs(startDate)}
             onChange={handleStartDateChange}
           />
-            <Typography>
-              Date and Time: {formatDate(startDate)}
-            </Typography>
         </LocalizationProvider>
         <TextField
           sx={{ margin: 2 }}

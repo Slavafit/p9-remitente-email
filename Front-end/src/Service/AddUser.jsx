@@ -17,15 +17,15 @@ import { styled } from '@mui/material/styles';
 import { addTokenToHeaders } from "./AuthUser";
 
 
-const TinyText = styled(Typography)({
-  fontSize: '0.9rem',
-  opacity: 0.7,
-  fontWeight: 500,
-  letterSpacing: 0.2,
-  marginTop: 4,
-  fontFamily: 'monospace',
-  display: 'flex'
-});
+// const TinyText = styled(Typography)({
+//   fontSize: '0.9rem',
+//   opacity: 0.7,
+//   fontWeight: 500,
+//   letterSpacing: 0.2,
+//   marginTop: 4,
+//   fontFamily: 'monospace',
+//   display: 'flex'
+// });
 
 export default function SignUp( {showSnack, open, close} ) {
   const [formData, setFormData] = useState({
@@ -121,7 +121,6 @@ export default function SignUp( {showSnack, open, close} ) {
   return (
     <Dialog open={open} onClose={close}>
       <DialogContent sx={{padding: 3}}>
-      {/* <Widget> */}
         <Box
           sx={{
             mt: 0,
@@ -248,7 +247,6 @@ export default function SignUp( {showSnack, open, close} ) {
             </Grid>
           </Box>
         </Box>
-      {/* </Widget> */}
       <DialogActions sx={{flexDirection: 'column', gap:2, my:2}}>
           <Button 
           variant="outlined"

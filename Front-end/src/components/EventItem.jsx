@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { styled } from '@mui/material/styles';
+import { styled, useTheme} from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import Fab from '@mui/material/Fab';
@@ -197,20 +196,24 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
           }
         });
       setAddOpen(false);
-      showSnack(response.data.message);
+      showSnack('success', response.data.message);
       setTimeout(() => {
         fetchEvents();
       }, 2000);
       // console.log("Event created:", response.data.message);
       setLoading(false);
     } catch (error) {
-      if (error.response) {
-        const errorMessage = error.response.data.error;
-        showSnack(errorMessage);
+      if ( error.response.data && error.response.data.message) {
+        const resError = error.response.data.message;
         console.error("Error create event:", error);
-        setLoading(false);
-      } else {
+        // showSnack(resError);
+        showSnack('warning', resError);
+    } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+        const resError = error.response.data.errors[0].message;
+        showSnack('warning', resError);
+    } else {
         console.error("Network error:", error);
+        showSnack('warning', 'Network error');
       }
     }
   };
@@ -230,13 +233,14 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
 
     const handleEditEvent = async (eventData) => {
       try {
+        console.log(eventData);
         setLoading(true);
         addTokenToHeaders();
         const response = await axios.put(
           `http://localhost:5000/events/?_id=${selectedEvent._id}`, 
           eventData);
           let message = response.data.name;
-        showSnack(`Event "${message}" was edited successfully`)
+        showSnack(`Evento "${message}" editado correctamente`)
           console.log(response.data);
         setTimeout(() => {
           fetchEvents();
@@ -267,6 +271,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         setDelOpen(false);
         fetchEvents();
         setLoading(false);
+        showSnack('warning', `El evento se ha eliminado correctamente`);
       } catch (error) {
         console.error("Error delete event:", error);
       }

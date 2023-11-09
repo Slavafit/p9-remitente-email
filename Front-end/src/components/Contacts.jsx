@@ -172,7 +172,7 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
     }, [refreshFlag]);
 
 
-  //добавление event
+  //добавление contact
   const handleAddContact = async (contactData) => {
     // console.log(contactData);
     try {
@@ -182,20 +182,24 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
         "http://localhost:5000/contacts/", contactData);
       setAddOpen(false);
       // console.log(response.data);
-      showSnack(response.data.message);
+      showSnack('success', response.data.message);
       setTimeout(() => {
         fetchContacts();
       }, 2000);
       // console.log("contact created:", response.data.message);
       setLoading(false);
     } catch (error) {
-      if (error.response) {
-        const errorMessage = error.response.data;
-        showSnack(errorMessage.message)
-        // console.log(errorMessage.message)
-        console.error("Error create event:", error);
-      } else {
-        console.error("Network error:", error);
+      if ( error.response.data && error.response.data.message) {
+        const resError = error.response.data.message;
+        // showSnack(resError);
+        showSnack('warning', resError);
+    } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+        const resError = error.response.data.errors[0].message;
+        console.log(resError);
+        showSnack('warning', resError);
+    } else {
+        console.error(`Error create contact ${listName}:`, error);
+        showSnack('warning', 'Error post contact');
       }
     }
   };

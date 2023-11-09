@@ -25,6 +25,7 @@ function Home() {
   const [search, setSearch] = useState('')
   const [snackOpen, setSnackOpen] = useState(false)
   const [snackMessage, setSnackMessage] = useState('');
+  const [snackTitle, setSnackTitle] = useState('');
   const [displayItem, setDisplayItem] = useState('');
   const [displayMail, setDisplayMail] = useState(''); 
   const [showPersonal, setShowPersonal] = React.useState(null); 
@@ -36,9 +37,12 @@ function Home() {
   const [lists, setLists] = useState({});
   const [loading, setLoading] = React.useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [mailLists, setMailLists] = useState(false);
 
-  const handleShowSnack = (message) => {
+  const handleShowSnack = (title, message) => {
     setSnackMessage(message);
+    setSnackTitle(title);
+    // console.log("title:",snackTitle, "snackMessage",snackMessage);
     setSnackOpen(true);
   };
 
@@ -53,6 +57,10 @@ function Home() {
   const updateContacts = (updatedContacts) => {
     // console.log("Home", contacts)
     setContacts(updatedContacts);
+  };
+  const updateMailLists = (mailLists) => {
+    // console.log("Home", mailLists)
+    setMailLists(mailLists);
   };
   const openPeronal = () => {
     setDisplayItem(null);
@@ -93,7 +101,7 @@ function Home() {
         />
         {displayItem === 'EventTable' && (
           <EventTable
-            showSnack={handleShowSnack}
+            showSnack={(title, message)=>handleShowSnack(title, message)}
             search={search}
             updateEvents={updateEvents}
             setLoading={setLoading}
@@ -117,6 +125,7 @@ function Home() {
               search={search}
               setLoading={setLoading}
               refreshFlag={refreshFlag}
+              updateMailLists={updateMailLists}
              />
           </AccordionDetails>
         </Accordion>
@@ -128,7 +137,8 @@ function Home() {
               <Remitente
                 contacts={contacts}
                 events={events}
-                showSnack={handleShowSnack}
+                showSnack={(title, message)=>handleShowSnack(title, message)}
+                mailLists={mailLists}
               />
           </AccordionDetails>
         </Accordion>
@@ -152,7 +162,7 @@ function Home() {
           </AccordionSummary>
           <AccordionDetails>
               <ContactTable
-                showSnack={handleShowSnack}
+                showSnack={(title, message)=>handleShowSnack(title, message)}
                 search={search}
                 lists={lists}
                 updateContacts={updateContacts}
@@ -167,7 +177,7 @@ function Home() {
           </AccordionSummary>
           <AccordionDetails>
               <ListManager
-                showSnack={handleShowSnack}
+                showSnack={(title, message)=>handleShowSnack(title, message)}
                 search={search}
                 updateLists={updateLists}
                 setLoading={setLoading}
@@ -215,6 +225,7 @@ function Home() {
           snackOpen={snackOpen}
           handleClose={()=>setSnackOpen(false)}
           message={snackMessage}
+          title={snackTitle}
         />
         <ShowBackdrop
           loading={loading}

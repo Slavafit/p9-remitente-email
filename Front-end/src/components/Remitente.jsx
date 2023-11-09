@@ -4,7 +4,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import {Select, FormControl, InputLabel, OutlinedInput, MenuItem, Stack} from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
+import EventRepeatIcon from '@mui/icons-material/EventRepeat';
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import Fab from '@mui/material/Fab';
 import { addTokenToHeaders } from "../service/AuthUser";
 import axios from 'axios';
@@ -21,21 +22,35 @@ const StyledFab = styled(Fab)({
   flexDirection: 'column',
   alignItems: 'center'
 });
+const StyleFab = styled(Fab)({
+  position: 'absolute',
+  zIndex: 1,
+  top: 9,
+  left: "40%",
+  right: 0,
+  margin: '0 auto',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
+});
 
 
 
-export default function Remitente({showSnack, contacts, events}) {
+export default function Remitente({showSnack, contacts, events, mailLists}) {
   const [selectedIds, setSelectedIds] = React.useState([]);
   const [filteredContacts, setFilteredContacts] = React.useState(contacts);
   const [selectedEvent, setSelectedEvent] = useState('');
+  const [existeEvent, setExisteEvent] = useState('');
+  const [selmailLists, setMailLists] = useState('');
   const [selectedEventId, setSelectedEventId] = useState('');
 
   // console.log(events);
   
-  //обработчик выбора события
+  //обработчик выбора нового события
   const handleChange = (event) => {
     setSelectedEvent(event.target.value);
     const selectedEventName = event.target.value;
+    // console.log(event);
 
       // Находим событие в массиве events по его имени
     const selectedEvent = events.find(event => event.name === selectedEventName);
@@ -43,6 +58,22 @@ export default function Remitente({showSnack, contacts, events}) {
       setSelectedEventId(selectedEvent._id);
     }
   };
+
+
+
+    //обработчик выбора открытого события
+    const handleEventUsedChange = (event) => {
+      setMailLists(event.target.value);
+      const selectedEventId = event.target.value;
+      // console.log(selectedEventId);
+
+            // Находим событие в массиве events по его имени
+    const findExisteEvent = events.find(event => event._id === selectedEventId);
+    if (findExisteEvent) {
+      setExisteEvent(findExisteEvent.name);
+      // console.log(existeEvent);
+    }
+    };
 
   // Фильтрация событий, где used равно false
   const filteredEvents = events.filter(event => !event.used); 
@@ -132,29 +163,67 @@ export default function Remitente({showSnack, contacts, events}) {
           contacts: selectedIds
         };
 
-        console.log("maillistPost", mailData);
         addTokenToHeaders();
         const response = await axios.post(`http://localhost:5000/maillists`, mailData);
+        let responseData = response.data.message;
+        // console.log(responseData);
+        showSnack('success', responseData);
+      } catch (error) {
+        if ( error.response.data && error.response.data.message) {
+          const resError = error.response.data.message;
+          // showSnack(resError);
+          showSnack('warning', resError);
+      } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+          const resError = error.response.data.errors[0].message;
+          showSnack('warning', resError);
+      } else {
+          console.error("Error post MailList:", error);
+          showSnack('Error post MailList');
+        }
+      }
+    };
+
+
+    //метод Patch
+
+    const maillistPatch = async () => {
+      try {
+        const mailData = {
+          eventId: selmailLists,
+          eventName: existeEvent,
+          contacts: selectedIds
+        };
+        console.log(mailData);
+        addTokenToHeaders();
+        const response = await axios.patch(`http://localhost:5000/maillists`, mailData);
         let responseData = response.data.message;
         console.log(responseData);
         showSnack(responseData);
       } catch (error) {
-        let resError = error.response.data.message;
-        showSnack(resError);
-        console.error("Error post MailList:", error);
+        if ( error.response.data && error.response.data.message) {
+          const resError = error.response.data.message;
+          showSnack(resError);
+      } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+          const resError = error.response.data.errors[0].message;
+          showSnack(resError);
+      } else {
+          console.error("Error patch MailList:", error);
+          showSnack('Error patch MailList');
+        }
       }
     };
 
 
   return (
     <Paper elevation={3} sx={{ height: 'auto', width: '100%', backgroundColor: 'grey.300' }}>
-      <FormControl sx={{ m: 1,  minWidth: 250 }}>
-        <InputLabel id="event-name">New events</InputLabel>
+      <FormControl sx={{ m: 1,  minWidth: 300 }}>
+        <InputLabel id="event-name">Eventos nuevos</InputLabel>
         <Select
+        title="Eventos nuevos"
           labelId="event-name"
           value={selectedEvent}
           onChange={handleChange}
-          input={<OutlinedInput label="Event" />}
+          input={<OutlinedInput label="Eventos nuevos" />}
           autoFocus
           onKeyDown={handleKeyDown}
           >
@@ -165,10 +234,36 @@ export default function Remitente({showSnack, contacts, events}) {
             ))}
         </Select>
         </FormControl>
+        <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="event-name">Eventos abiertos</InputLabel>
+        <Select
+          title="eventos abiertos"
+          labelId="event-name"
+          value={selmailLists}
+          onChange={handleEventUsedChange}
+          input={<OutlinedInput label="Eventos abiertos" />}
+          onKeyDown={handleKeyDown}
+          autoFocus
+          >
+            {mailLists && mailLists.length > 0 && mailLists.map((event) => {
+              const foundEvent = events.find((e) => e._id === event.event);
+              return (
+                <MenuItem key={event._id} value={event.event}>
+                  {foundEvent ? foundEvent.name : ''}
+                </MenuItem>
+              );
+            })}
+        </Select>
+      </FormControl>
         <Stack direction="row" spacing={2}>
-          <StyledFab title="send" size="medium" color="secondary">
-              <SendIcon onClick={() => maillistPost()}/>
+          <StyledFab title="Mandar contactos" size="small" color="secondary">
+              <ForwardToInboxIcon onClick={() => maillistPost()}/>
           </StyledFab>
+        </Stack>
+        <Stack direction="row" spacing={2}>
+          <StyleFab title="añadir contactos" size="small" color="secondary">
+              <EventRepeatIcon onClick={() => maillistPatch()}/>
+          </StyleFab>
         </Stack>
       <DataGrid
         // rows={filteredContacts}

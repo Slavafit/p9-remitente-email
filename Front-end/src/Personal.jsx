@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { styled } from "@mui/material/styles";
 import {
   Avatar, Box, Typography, IconButton,   Button,
   Dialog,
@@ -129,7 +128,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         <DialogActions sx={{flexDirection: 'column', gap:2, my:2}}>
           <Button 
           fullWidth
-          variant="text"
+          variant="outlined"
           onClick={close} 
           color="success">
             Cancel

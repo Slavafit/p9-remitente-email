@@ -1,17 +1,22 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react'
-import { Select, MenuItem, TextField, Button, FormControl,
-   InputLabel, Box, OutlinedInput,  List,
-   ListItem,
-   ListItemText,
-   Table,
-   TableBody,
-   TableCell,
-   TableContainer,
-   TableHead,
-   TableRow,
-   Paper,
-   Checkbox,} from '@mui/material';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Paper from '@mui/material/Paper';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import axios from 'axios';
 import Stack from '@mui/material/Stack';
 import { addTokenToHeaders } from "../service/AuthUser";
@@ -19,7 +24,7 @@ import { addTokenToHeaders } from "../service/AuthUser";
 
 
 
-const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshFlag }) => {
+const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshFlag, updateMailLists }) => {
   const [eventName, setEventName] = React.useState([]);
   const [mailLists, setMailList] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState('');
@@ -56,6 +61,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
       let fetchedData = response.data;
       setMailList(fetchedData);
       setLoading(false);
+      updateMailLists(fetchedData);
     } catch (error) {
       showSnack(error.data.message);
       console.error("Error fetching MailLists:", error);
@@ -89,7 +95,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
 
     const getContactStatus = (contact) => {
       const list = mailLists.find((list) =>
-        list.entries.some((entry) => entry.contact === contact._id)
+        list.entries.some((entry) => entry.contact === contact._id && list.event === selectedEventId)
       );
     
       if (list) {
@@ -108,9 +114,9 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
       return null;
     };
 
-    const getResponse = (contact) => {
+    const getContactResponse = (contact) => {
       const list = mailLists.find((list) =>
-        list.entries.some((entry) => entry.contact === contact._id)
+        list.entries.some((entry) => entry.contact === contact._id && list.event === selectedEventId)
       );
     
       if (list) {
@@ -129,7 +135,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
           return (
             <div>
               <span style={{ color: color }}>
-                {contactEntry.response || 'Vacío'}
+                {contactEntry.response || 'Vacía'}
               </span>
             </div>
           );
@@ -140,14 +146,15 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
 
 
   return (
-    <Box>
-      <FormControl sx={{ m: 1, width: 200 }}>
-        <InputLabel id="event-name">Event</InputLabel>
+    <Paper elevation={3} sx={{ height: 'auto', width: '100%', backgroundColor: 'grey.300' }}>
+      <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="event-name">Eventos abiertos</InputLabel>
         <Select
+          title="eventos abiertos"
           labelId="event-name"
           value={selectedEventId}
           onChange={handleChange}
-          input={<OutlinedInput label="Event" />}
+          input={<OutlinedInput label="Eventos abiertos" />}
           onKeyDown={handleKeyDown}
           autoFocus
           >
@@ -190,7 +197,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
                     {getContactStatus(contact)}
                   </TableCell>
                   <TableCell align="right">
-                    {getResponse(contact)}
+                    {getContactResponse(contact)}
                   </TableCell>
 
               </TableRow>
@@ -198,7 +205,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </Paper>
   );
 };
 
