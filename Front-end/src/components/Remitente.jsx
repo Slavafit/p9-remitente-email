@@ -154,7 +154,6 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
 
 
     //метод Post
-
     const maillistPost = async () => {
       try {
         const mailData = {
@@ -185,7 +184,6 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
 
 
     //метод Patch
-
     const maillistPatch = async () => {
       try {
         const mailData = {
@@ -197,18 +195,17 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
         addTokenToHeaders();
         const response = await axios.patch(`http://localhost:5000/maillists`, mailData);
         let responseData = response.data.message;
-        console.log(responseData);
         showSnack(responseData);
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          showSnack(resError);
+          showSnack('warning', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
           const resError = error.response.data.errors[0].message;
-          showSnack(resError);
+          showSnack('warning', resError);
       } else {
           console.error("Error patch MailList:", error);
-          showSnack('Error patch MailList');
+          showSnack('warning','Error patch MailList');
         }
       }
     };

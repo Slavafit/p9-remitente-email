@@ -134,7 +134,7 @@ export default function LogIn() {
             >
               <Avatar alt="logo Don Bosco" src={logo}/>
               <Typography component="h1" variant="h5" sx={{ mt: 2 }}>
-                Log in
+                Acceso
               </Typography>
               <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                 <TextField
@@ -151,11 +151,11 @@ export default function LogIn() {
                 />
                 {isEmailValid ? (
                   <TinyText sx={{ color: 'green' }}>
-                    Email address is valid.
+                    Email es válida.
                   </TinyText>
                 ) : (
                   <TinyText sx={{ color: 'red' }}>
-                    Please, enter a valid email address.
+                    Por favor, introduce email válida.
                   </TinyText>
                 )}
                 <TextField
@@ -172,11 +172,11 @@ export default function LogIn() {
                 />
                   {isPassValid ? (
                   <TinyText sx={{ color: 'green' }}>
-                    Password is valid.
+                    La contraseña es válida.
                   </TinyText>
                 ) : (
                   <TinyText sx={{ color: 'red' }}>
-                    minimum 4 and maximum 20 characters.
+                    mínimo 6 y máximo 20 caracteres.
                   </TinyText>
                 )}
                   <FormControlLabel
@@ -201,7 +201,7 @@ export default function LogIn() {
                 marginTop: 0,
                 textAlign: "center",
                 opacity: 0.8
-              }}>Fundacion Don Bosco © 
+              }}>Fundación Don Bosco © 
                 {' '}
                 {new Date().getFullYear()}
                 {'.'}

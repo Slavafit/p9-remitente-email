@@ -202,7 +202,7 @@ function Home() {
         />
         {showPersonal && (
           <ProfilePage
-            showSnack={handleShowSnack}
+            showSnack={(title, message)=>handleShowSnack(title, message)}
             open={open}
             close={()=>setShowPersonal(false)}
           />

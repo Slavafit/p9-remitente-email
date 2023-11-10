@@ -23,7 +23,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
   const [anchorEl, setAnchorEl] = React.useState(null);
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
-  let userRole = localStorage.getItem('userRole');
+  let userRole = sessionStorage.getItem('userRole');
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,7 +37,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
     <>
         <AppBar position='static'>
             <Toolbar>
-                {auth && (
+                {/* {auth && (
                     <div>
                 <IconButton
                 size="medium"
@@ -51,7 +51,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
                 <MenuIcon />
             </IconButton>
             </div>
-                )}
+                )} */}
                 <Typography
                     variant='h6'
                     component='a'

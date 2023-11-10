@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import {
-  Box, Typography, IconButton, Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-} from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
@@ -17,15 +14,15 @@ import { styled } from '@mui/material/styles';
 import { addTokenToHeaders } from "./AuthUser";
 
 
-// const TinyText = styled(Typography)({
-//   fontSize: '0.9rem',
-//   opacity: 0.7,
-//   fontWeight: 500,
-//   letterSpacing: 0.2,
-//   marginTop: 4,
-//   fontFamily: 'monospace',
-//   display: 'flex'
-// });
+const TinyText = styled(Typography)({
+  fontSize: '0.9rem',
+  opacity: 0.7,
+  fontWeight: 500,
+  letterSpacing: 0.2,
+  marginTop: 4,
+  fontFamily: 'monospace',
+  display: 'flex'
+});
 
 export default function SignUp( {showSnack, open, close} ) {
   const [formData, setFormData] = useState({
@@ -62,22 +59,22 @@ export default function SignUp( {showSnack, open, close} ) {
     const newErrorMessages = { ...errorMessages };
   
     if (formData.username.trim() === "") {
-      newErrorMessages.username = "Please provide a username.";
+      newErrorMessages.username = "Por favor, proporcione un nombre de usuario.";
       hasErrors = true;
     }
   
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      newErrorMessages.email = "Please provide an email address.";
+      newErrorMessages.email = "Por favor proporcione una dirección de correo electrónico.";
       hasErrors = true;
     }
   
     if (formData.password.trim() === "") {
-      newErrorMessages.password = "Please provide a password.";
+      newErrorMessages.password = "Por favor proporcione una contraseña.";
       hasErrors = true;
     }
   
     if (formData.password !== formData.confirmPassword) {
-      newErrorMessages.confirmPassword = "Passwords do not match.";
+      newErrorMessages.confirmPassword = "Las contraseñas no coinciden.";
       hasErrors = true;
     }
     setErrorMessages(newErrorMessages); // Обновляем сообщения об ошибках
@@ -85,6 +82,7 @@ export default function SignUp( {showSnack, open, close} ) {
 
     if (!hasErrors) {
       try {
+        addTokenToHeaders();
         const response = await axios.post(
           "http://localhost:5000/registration", formData);
         let responseMessage = response.data.message;
@@ -153,7 +151,7 @@ export default function SignUp( {showSnack, open, close} ) {
                       <TinyText sx={{ color: 'red' }}>{errorMessages.username}</TinyText>
                     ) : (
                       <TinyText sx={{ color: 'green' }}>
-                        Please provide a username.
+                        Por favor proporcione un nombre de usuario.
                       </TinyText>
                     )
                   }
@@ -174,7 +172,7 @@ export default function SignUp( {showSnack, open, close} ) {
                         <TinyText sx={{ color: 'red' }}>{errorMessages.email}</TinyText>
                       ) : (
                         <TinyText sx={{ color: 'green' }}>
-                          Please provide a Email.
+                          Por favor proporcione un correo electrónico.
                         </TinyText>
                       )
                     }
@@ -196,7 +194,7 @@ export default function SignUp( {showSnack, open, close} ) {
                         <TinyText sx={{ color: 'red' }}>{errorMessages.password}</TinyText>
                       ) : (
                         <TinyText sx={{ color: 'green' }}>
-                          Please provide a password.
+                          Por favor proporcione una contraseña.
                         </TinyText>
                       )
                     }
@@ -217,7 +215,7 @@ export default function SignUp( {showSnack, open, close} ) {
                         <TinyText sx={{ color: 'red' }}>{errorMessages.confirmPassword}</TinyText>
                       ) : (
                         <TinyText sx={{ color: 'green' }}>
-                          Please provide a confirm Password.
+                          Por favor proporcione una contraseña confirmada.
                         </TinyText>
                       )
                     }
@@ -242,7 +240,7 @@ export default function SignUp( {showSnack, open, close} ) {
                 variant="outlined"
                 endIcon={<SendIcon />}
               >
-                Send
+                Enviar
               </Button>
             </Grid>
           </Box>
@@ -254,7 +252,7 @@ export default function SignUp( {showSnack, open, close} ) {
           color="success"
           endIcon={<CloseIcon />}
           >
-            Cancel
+            Cancelar
           </Button>
         </DialogActions>
       </DialogContent>

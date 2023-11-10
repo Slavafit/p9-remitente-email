@@ -46,7 +46,7 @@ class controller {
             const lowerCaseEmail = email.toLowerCase();
             const candidate = await UserModel.findOne({ $or: [{ username }, { email: lowerCaseEmail }] });    //ищем пользователя в БД
             if (candidate) {        //если нашли вернули сообщение
-                return res.status(400).json({message: `User with ${username} or ${lowerCaseEmail} already exists`});
+                return res.status(400).json({message: `Usuario con ${username} or ${lowerCaseEmail} ya existe`});
             }
             const hashPassword = bcrypt.hashSync(password, 7);  //захешировали пароль
             const userRole = await RoleModel.findOne({value: "USER"})    //ищем роль
@@ -54,23 +54,23 @@ class controller {
             await user.save()   //сохраняем в БД
             
             const mailMessage = {
-                from: 'Remitente de invitaciones,',
+                from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
                 to: `${lowerCaseEmail}`,
-                subject: `Successfully registred on our site "Remitente de invitaciones"`,
+                subject: `Registrado exitosamente en nuestro sitio "Remitente de invitaciones."`,
                 html: `
-                <h2>Congratulations, ${username}! You are successfully registred on our site!</h2>
+                <h2>Felicidades, ${username}! Estás registrado exitosamente en nuestro sitio!</h2>
                 
-                <i>your account information:</i>
+                <i>información de su cuenta:</i>
                 <ul>
-                    <li>username: ${username}</li>
-                    <li>email: ${lowerCaseEmail}</li>
-                    <li>password: ${password}</li>
+                    <li>nombre de usuario: ${username}</li>
+                    <li>correo electrónico: ${lowerCaseEmail}</li>
+                    <li>contraseña: ${password}</li>
                 </ul>
                 
-                <p>This letter does not require a reply.<p>`
+                <p>Esta carta no requiere respuesta.<p>`
             }
             mailer(mailMessage);
-            return res.json({message: `User ${username} has been successfully registered`})  //вернули сообщение клиенту
+            return res.json({message: `Usuario ${username} ha sido registrado exitosamente`})  //вернули сообщение клиенту
 
         } catch (e) {
             console.log(e)
@@ -87,12 +87,12 @@ class controller {
             const user = await UserModel.findOne({email: lowerCaseEmail })
             //если не найден, то объект будет пустой и пойдет по условию ниже
             if (!user) {
-                return res.status(404).json({message: `User with ${email} not found`})
+                return res.status(404).json({message: `Usuario con ${email} extraviado`})
             }
             //расшифровываю пароль клиента при помощи compareSync
             const validPassword = bcrypt.compareSync(password, user.password)
             if (!validPassword) {
-                return res.status(401).json({message: `Incorrect password entered`})
+                return res.status(401).json({message: `Contraseña incorrecta introducida`})
             }
             //генерирую токен и отправляю клиенту
             const token = generateAccessToken(user._id, user.roles)
@@ -100,7 +100,7 @@ class controller {
             return res.json({token, userData})
         } catch (e) {
             console.log(e)
-            res.status(400).json({message: 'Login error'})
+            res.status(400).json({message: 'Login errorError de inicio de sesión'})
         }
     }
 
@@ -151,9 +151,67 @@ class controller {
             //Заменяем найденное новым объектом
             const user = await UserModel.findByIdAndUpdate(_id, updatedUser, { new: true });
             if (!user) {
-                return res.status(404).json({ message: `User not updated` });
+                return res.status(404).json({ message: `Usuario no actualizado` });
             }
             res.json(user); // обновленные данные в ответе
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    // Обработчик для сброса пароля
+    async changePassword(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = errors.array().map(error => ({
+            
+                  message: error.msg,
+                }));
+                return res.status(400).json({errors: errorMessages });
+            }
+            const _id = req.params.id;
+            const { oldPassword, newPassword } = req.body; // обновленные данные из тела запроса
+            // console.log(_id)
+            // console.log(oldPassword,newPassword)
+            //ищем пользователя в базе
+            const user = await UserModel.findById(_id)
+            //если не найден, то объект будет пустой и пойдет по условию ниже
+            if (!user) {
+                return res.status(404).json({message: `Usuario no encontrado`})
+            }
+            const email = user.email;
+            //расшифровываю пароль клиента при помощи compareSync
+            const validPassword = bcrypt.compareSync(oldPassword, user.password)
+            if (!validPassword) {
+                return res.status(401).json({message: `Se ingresó una contraseña antigua incorrecta`})
+            }
+
+            const hashPassword = bcrypt.hashSync(newPassword, 7);  //захешировали пароль
+            const updatedUser = await UserModel.findByIdAndUpdate(
+                _id, 
+                {password: hashPassword}, 
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: `User not updated` });
+            }
+            const mailMessage = {
+                from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
+                to: `${email}`,
+                subject: `Aviso de cambio de contraseña en el sitio web "Remitente de invitaciones"`,
+                html: `
+                <h2>Felicidades, has establecido una nueva contraseña</h2>
+                
+                <h4>Tu nueva contraseña: ${newPassword}</h4>
+                
+                <p>Esta carta no requiere respuesta..<p>`
+            }
+            mailer(mailMessage);
+
+            res.json(updatedUser); // обновленные данные в ответе
         } catch (e) {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
@@ -182,26 +240,6 @@ class controller {
 
 
     // Обработчик создания записи в MailList
-    // async createMailList(req, res) {
-    //     try {
-    //         const mailListData = req.body; // Данные из тела запроса
-    //         const { event, entries } = mailListData;
-        
-    //         // Создаем новую запись для модели MailList
-    //         const mailList = new MailListModel({ event, entries });
-
-    //         // Обновляем флаг `used` в событии
-    //         await EventModel.findByIdAndUpdate(event, { used: true });
-        
-    //         // Сохраняем запись в базу данных
-    //         await Promise.all([mailList.save()]);
-        
-    //         res.status(201).json({ message: 'MailList created successfully' });
-    //     } catch (e) {
-    //         console.error(e);
-    //         res.status(500).json({ error: 'createMailList error', message: e.message });
-    //     }
-    // }
     async createMailList(req, res) {
         try {
             const { eventId, contacts, eventName } = req.body;
@@ -228,10 +266,10 @@ class controller {
             const mailList = new MailListModel({ event: eventId, entries });
 
             // Обновляем флаг `used` в событии
-            // await EventModel.findByIdAndUpdate(eventId, { used: true });
+            await EventModel.findByIdAndUpdate(eventId, { used: true });
         
             // Сохраняем запись в базу данных
-            // await mailList.save();
+            await mailList.save();
                 
             // Отправляем сообщения электронной почты
             for (const contact of contacts) {
@@ -268,32 +306,28 @@ class controller {
                         <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
                         <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
                         <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
-                        <button onclick="sendResponse('Voy')">Si, voy.</button>
-                        <script>
-                        function sendResponse(response) {
-                            fetch(http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy)
-                                .then(response => {
-                                    if (response.ok) {
-                                        // Здесь можно обработать успешный ответ от сервера
-                                        alert('Ответ успешно отправлен!');
-                                    } else {
-                                        // Обработка других статусов ответа
-                                    }
-                                })
-                                .catch(error => console.error('Ошибка:', error));
-                        }
-                        </script>
                         </body>
                         </html>
                         `,
                     };
-                    mailer(mailMessage);
-
-                    // Обновление флага isSent в MailList
-                    await MailListModel.findOneAndUpdate(
-                        { event: eventId, 'entries.contact': contact },
-                        { $set: { 'entries.$.isSent': true } }
-                    );
+                    mailer(mailMessage)
+                    .then(info => {
+                        // Обработка успешной отправки
+                        console.log('Email sent: ', info);
+                
+                        // Обновление флага isSent в MailList
+                        return MailListModel.findOneAndUpdate(
+                            { event: eventId, 'entries.contact': contact },
+                            { $set: { 'entries.$.isSent': true } }
+                        );
+                    })
+                    .then(() => {
+                        console.log('Flag isSent updated successfully');
+                    })
+                    .catch(err => {
+                        // Обработка ошибок
+                        console.error('Error sending email: ', err);
+                    });
                 }
             }
             res.status(201).json({ message: `MailList with event "${eventName}" created successfully` });
@@ -374,18 +408,21 @@ class controller {
                     mailer(mailMessage)
                         .then(info => {
                             // Обработка успешной отправки
-                            console.log('Email sent: ', info);
+                            // console.log('Email sent: ', info);
+                    
+                            // Обновление флага isSent в MailList
+                            return MailListModel.findOneAndUpdate(
+                                { event: eventId, 'entries.contact': contact },
+                                { $set: { 'entries.$.isSent': true } }
+                            );
+                        })
+                        .then(() => {
+                            console.log('Flag isSent updated successfully');
                         })
                         .catch(err => {
                             // Обработка ошибок
                             console.error('Error sending email: ', err);
                         });
-
-                    // Обновление флага isSent в MailList
-                    await MailListModel.findOneAndUpdate(
-                        { event: eventId, 'entries.contact': contact },
-                        { $set: { 'entries.$.isSent': true } }
-                    );
                 }
 
             }

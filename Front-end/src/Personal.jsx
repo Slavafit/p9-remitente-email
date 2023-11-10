@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from "react";
-import {
-  Avatar, Box, Typography, IconButton,   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider
-} from "@mui/material";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Dialog from "@mui/material/Dialog";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
 import axios from "axios";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
+import LockResetIcon from '@mui/icons-material/LockReset';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { addTokenToHeaders } from "./service/AuthUser";
 import EditModal from "./components/modals/editUserModal";
 import DeleteUserModal from "./components/modals/deleteUserModal";
+import ChangePasswordModal from "./components/modals/changePassModal";
 
 
 const ProfilePage = ( {showSnack, open, close} ) => {
   const [users, setUsers] = useState(true);
-  let username = localStorage.getItem('username');
+  let username = sessionStorage.getItem('username');
   const [editOpen, setEditOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -55,7 +57,6 @@ const ProfilePage = ( {showSnack, open, close} ) => {
 
   
     //метод редактирования
-
     const handleEditUser = (user) => {
       setSelectedUser(user);
       setEditOpen(true);
@@ -74,12 +75,53 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         let username = response.data.username;
         localStorage.setItem('username', username);
         setEditOpen(false)
-        showSnack(`User ${username} updated successfully` );
+        showSnack(`Usuario "${username}" actualizado exitosamente` );
       } catch (error) {
-        console.error("Error updating user:", error);
-        const resError = error.response.data.errors[0];
-        console.log(resError.message);
-        showSnack(resError.message);
+        if ( error.response.data && error.response.data.message) {
+          const resError = error.response.data.message;
+          showSnack('warning', resError);
+      } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+          const resError = error.response.data.errors[0].message;
+          showSnack('warning', resError);
+      } else {
+          console.error("Error updating user:", error);
+          showSnack('warning', 'Error updating user');
+        }
+      }
+    };
+
+
+    //Reset password
+    const handleResetPass = (user) => {
+      setSelectedUser(user);
+      setResetOpen(true);
+    };
+    const resetPassword = async (oldPassword, newPassword) => {
+      try {
+        const id = users._id
+        const userData = {
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        };
+        // console.log(id,userData);
+        addTokenToHeaders();
+        const response = await axios.post(
+          `http://localhost:5000/changepassword/${id}`, userData 
+          );
+        setResetOpen(false)
+        showSnack('success', `Password updated successfully` );
+      } catch (error) {
+        if ( error.response.data && error.response.data.message) {
+          const resError = error.response.data.message;
+          // showSnack(resError);
+          showSnack('warning', resError);
+      } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+          const resError = error.response.data.errors[0].message;
+          showSnack('warning', resError);
+      } else {
+          console.error("Error update password:", error);
+          showSnack('warning', 'Error update password');
+        }
       }
     };
     
@@ -117,10 +159,13 @@ const ProfilePage = ( {showSnack, open, close} ) => {
                 {users.email}
               </Typography>
               <Box>
-                <IconButton onClick={() => handleEditUser(users)}>
-                  <EditRoundedIcon />
+                <IconButton title="Cambia tu cuenta"  onClick={() => handleEditUser(users)}>
+                  <EditRoundedIcon/>
                 </IconButton>
-                <IconButton onClick={() => setDeleteOpen(true)}>
+                <IconButton title="Restablecer la contraseña" onClick={() => handleResetPass(true)}>
+                  <LockResetIcon fontSize="large"/>
+                </IconButton>
+                <IconButton title="Elimina tu cuenta" onClick={() => setDeleteOpen(true)}>
                   <DeleteIcon />
                 </IconButton>
               </Box>
@@ -131,7 +176,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
           variant="outlined"
           onClick={close} 
           color="success">
-            Cancel
+            Cancelar
           </Button>
         </DialogActions>
         </DialogContent>
@@ -141,6 +186,11 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         handleClose={() => setEditOpen(false)}
         onSubmit={editUser}
         selectedUser={selectedUser}
+        />
+        <ChangePasswordModal
+        resetOpen={resetOpen}
+        handleClose={() => setResetOpen(false)}
+        onSubmit={resetPassword}
         />
         <DeleteUserModal
         deleteOpen={deleteOpen}

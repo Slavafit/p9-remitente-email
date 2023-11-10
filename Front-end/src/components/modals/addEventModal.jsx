@@ -98,7 +98,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
               required
               label="Event Image"
               type="file"
-              accept="image/*"
+              accept="image/*,.png,.jpeg,.jpg,.web,.pdf"
               onChange={handleImageChange}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="DE">

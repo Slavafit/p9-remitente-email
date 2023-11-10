@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
-
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Dialog from "@mui/material/Dialog";
+import Button from "@mui/material/Button";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
 const EditModal = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -22,12 +28,26 @@ const EditModal = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
 
   return (
     <Dialog open={editOpen} onClose={handleClose}>
-      <DialogTitle>Edit User</DialogTitle>
-      <DialogContent>
-        <DialogContentText>Enter the new user details:</DialogContentText>
+      <DialogContent sx={{padding: 3, backgroundColor: 'grey.300'}}>
+      <Box
+          sx={{
+            padding: 5,
+            borderRadius: 5,
+            gap:2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            bgcolor: "Menu",
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'
+          }}
+        >
+        <DialogTitle>
+          Edite su perfil
+          </DialogTitle>
+        <DialogContentText>Introduce nuevos datos:</DialogContentText>
         <TextField
           sx={{ margin: 1 }}
-          label="Username" 
+          label="Nombre de usuario" 
           fullWidth
           value={username}
           onChange={handleUsernameChange}
@@ -39,20 +59,25 @@ const EditModal = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
           value={email}
           onChange={handleEmailChange}
         />
+      </Box>
+        <DialogActions sx={{ my:2}}>
+          <Button onClick={() => {
+            handleClose();
+            setUsername("");
+            setEmail("");
+          }}
+          variant="outlined"
+          color="success">
+            Cancelar
+          </Button>
+          <Button onClick={() => onSubmit(username, email)} 
+          variant="outlined"
+          color="success"
+          >
+            Guardar
+          </Button>
+        </DialogActions>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={() => {
-          handleClose();
-          setUsername("");
-          setEmail("");
-        }}
-        color="primary">
-          Cancel
-        </Button>
-        <Button onClick={() => onSubmit(username, email)} color="primary">
-          Save
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

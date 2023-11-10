@@ -3,8 +3,8 @@ import axios from 'axios';
 // Функция для аутентификации пользователя
 const authUser = async (email, password) => {
   try {
-    // Проверить, есть ли токен в localStorage
-    const storedToken = localStorage.getItem('token');
+    // Проверить, есть ли токен в sessionStorage
+    const storedToken = sessionStorage.getItem('token');
     if (storedToken) {
       // Если токен уже есть в localStorage, используйте его для аутентификации
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
@@ -20,11 +20,12 @@ const authUser = async (email, password) => {
       const userId = response.data.userData.userId;
       const username = response.data.userData.username;
       const userRole = response.data.userData.role;
-      // Сохранить токен и остальное в localStorage или в памяти приложения
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('username', username);
-      localStorage.setItem('userRole', userRole);
+      // Сохранить токен и остальное в sessionStorage или в памяти приложения
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('userId', userId);
+      sessionStorage.setItem('username', username);
+      sessionStorage.setItem('userRole', userRole);
+      sessionStorage.setItem('userRole', userRole);
       // Вернуть успех
       return true;
     }
@@ -47,7 +48,7 @@ const authUser = async (email, password) => {
 
 // Функция для добавления токена в заголовок запроса
 const addTokenToHeaders = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
