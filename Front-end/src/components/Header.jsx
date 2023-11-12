@@ -6,7 +6,6 @@ import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
@@ -108,7 +107,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
                             <ListItemIcon>
                                 <SettingsIcon/>
                             </ListItemIcon>
-                        Profile</MenuItem>
+                            Perfil</MenuItem>
                         {userRole === 'ADMIN' && (
                             <MenuItem
                             onClick={()=>{
@@ -118,7 +117,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
                                 <ListItemIcon>
                                     <PersonAddAltIcon />
                                 </ListItemIcon>
-                                Add User
+                                Agregar usuario
                             </MenuItem>
                         )}
                         {userRole === 'ADMIN' && (
@@ -130,7 +129,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
                                 <ListItemIcon>
                                     <SupervisorAccountIcon />
                                 </ListItemIcon>
-                                Show Users
+                                Mostrar usuarios
                             </MenuItem>
                         )}
                         <Divider/>
@@ -142,7 +141,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
                             <ListItemIcon>
                                 <LogoutRoundedIcon/>
                             </ListItemIcon>
-                        Logout</MenuItem>
+                        Cerrar sesión</MenuItem>
                     </Menu>
                     </div>
                 )}

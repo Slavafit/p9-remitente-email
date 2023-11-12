@@ -9,6 +9,7 @@ import {
   useNavigate
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./service/AuthContext";
+import ResetPasswordPage from './service/ResetPassword'
 
 
 
@@ -16,8 +17,9 @@ const ProtectedRoute = ({ element }) => {
   const { auth } = useAuth(); // Получите состояние авторизации из вашего AuthContext
   const navigate = useNavigate();
 
+
   if (!auth) {
-    navigate('/signin'); // Перенаправить на страницу входа, если пользователь не авторизован
+    navigate('/'); // Перенаправить на страницу входа, если пользователь не авторизован
     return null;
   }
 
@@ -25,15 +27,17 @@ const ProtectedRoute = ({ element }) => {
 };
 
 function App() {
-  
+
+
   return (
     <>
       <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/home" element={<Home />} />
-            {/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
+            {/* <Route path="/home" element={<Home />} /> */}
+            <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
             <Route path="/" element={<LogIn />} />
+            <Route exact path="/resetpassword/reset/:userId/:token" element={<ResetPasswordPage />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Router>

@@ -19,18 +19,15 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-// import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import AddContactModal from "./modals/addContactModal"
 import EditContactModal from "./modals/editContactModal"
 import DelContactModal from "./modals/delContactModal"
 import axios from "axios";
-import { addTokenToHeaders } from "../service/AuthUser";
-
+import { addTokenToHeaders } from "../service/addTokenToHeaders";
 
 const StyledFab = styled(Fab)({
   position: 'absolute',
@@ -294,7 +291,7 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
                   <TableCell component="th" scope="row">
                     {contact.nombre}
                   </TableCell>
-                  <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row"> 
                     {contact.cargo}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">

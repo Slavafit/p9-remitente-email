@@ -19,6 +19,15 @@ router.post('/changepassword/:id', [
      check ('newPassword', "La contraseña debe tener más de 6 y menos de 20 caracteres.")
      .isLength({min:6, max:20}, )
      ], controller.changePassword)
+router.post('/resetpassword/forgot', [
+     check('email', "Email no puede estar vacío").notEmpty(),
+     check('email', "No es un correo electrónico.").isEmail(),
+     ], controller.forgotPassword)
+router.post('/resetpassword/reset/:id/:token', [
+     check('password', "La nueva contraseña no puede estar vacía").notEmpty(),
+     check ('password', "La contraseña debe tener más de 6 y menos de 20 caracteres.")
+     .isLength({min:6, max:20}, )
+     ], controller.resetPassword)
 router.post('/events', [
      check('name', "Nombre de evento no puede estar vacía.").notEmpty(),
      ], authMiddleware, controller.createEvent)
@@ -37,8 +46,8 @@ router.post('/contacts', [
      check('email', "Compruebe la email").isEmail(),
      ], authMiddleware, controller.createContact)
 router.post('/maillists', [
-     check('contacts', "contactos no puede estar vacío!").isArray({ min: 1 }),
-     check('eventId', "Evento no puede estar vacío").notEmpty(),
+     check('eventId', "Seleccione un evento").notEmpty(),
+     check('contacts', "Seleccione uno o más contactos").isArray({ min: 1 })
      ], authMiddleware, controller.createMailList)
 
 
@@ -74,8 +83,8 @@ router.patch('/lists', [
      check('territorio', "no hay valores").notEmpty(),
      ], authMiddleware, controller.patchList)
 router.patch('/maillists', [
-     check('contacts', "Los contactos no pueden estar vacíos").isArray({ min: 1 }),
-     check('eventId', "Evento no puede estar vacío").notEmpty(),
+     check('contacts', "Seleccione uno o más contactos").isArray({ min: 1 }),
+     check('eventId', "Seleccione uno o más contactos").notEmpty(),
      check('eventName', "Evento no puede estar vacío").notEmpty()
      ], authMiddleware, controller.patchMailList)
 

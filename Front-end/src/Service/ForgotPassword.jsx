@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Grid from '@mui/material/Grid';
 import axios from "axios";
 import { styled } from '@mui/material/styles';
-import { addTokenToHeaders } from "./addTokenToHeaders";
+import { useAuth } from './AuthContext';
 
 
 const TinyText = styled(Typography)({
@@ -24,17 +24,14 @@ const TinyText = styled(Typography)({
   display: 'flex'
 });
 
-export default function SignUp( {showSnack, open, close} ) {
+export default function ForgotPassword( { open, close } ) {
+  const { showSnack } = useAuth();
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
     password: ""
   });
+
   const [errorMessages, setErrorMessages] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
+    email: ""
   });
 
   
@@ -58,23 +55,8 @@ export default function SignUp( {showSnack, open, close} ) {
     let hasErrors = false;
     const newErrorMessages = { ...errorMessages };
   
-    if (formData.username.trim() === "") {
-      newErrorMessages.username = "Por favor, proporcione un nombre de usuario.";
-      hasErrors = true;
-    }
-  
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       newErrorMessages.email = "Por favor proporcione una dirección de correo electrónico.";
-      hasErrors = true;
-    }
-  
-    if (formData.password.trim() === "") {
-      newErrorMessages.password = "Por favor proporcione una contraseña.";
-      hasErrors = true;
-    }
-  
-    if (formData.password !== formData.confirmPassword) {
-      newErrorMessages.confirmPassword = "Las contraseñas no coinciden.";
       hasErrors = true;
     }
     setErrorMessages(newErrorMessages); // Обновляем сообщения об ошибках
@@ -82,18 +64,15 @@ export default function SignUp( {showSnack, open, close} ) {
 
     if (!hasErrors) {
       try {
-        addTokenToHeaders();
         const response = await axios.post(
-          "http://localhost:5000/registration", formData);
+          "http://localhost:5000/resetpassword/forgot", formData);
         let responseMessage = response.data.message;
-        showSnack('success', responseMessage);
+        console.log(responseMessage);
         close();
+        showSnack('success', responseMessage);
         // Очистка формы и других состояний
         setFormData({
-          username: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
+          email: ""
         });
   
 
@@ -132,37 +111,14 @@ export default function SignUp( {showSnack, open, close} ) {
           }}
         >
           <Typography component="h1" variant="h5">
-            Añadir nuevo usuario
+            Restablecer la contraseña
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2}}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
                 <TextField
-                  required
-                  fullWidth
-                  autoComplete
-                  name="username"
-                  label="Nombre de usuario"
-                  value={formData.username}
-                  onChange={handleChange}
-                  error={!!errorMessages.username}
-                  helperText={
-                  errorMessages.username ? (
-                      <TinyText sx={{ color: 'red' }}>{errorMessages.username}</TinyText>
-                    ) : (
-                      <TinyText sx={{ color: 'green' }}>
-                        Por favor proporcione un nombre de usuario.
-                      </TinyText>
-                    )
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
                   fullWidth
                   label="Correo electrónico"
                   name="email"
+                  type="email"
                   autoComplete
                   value={formData.email}
                   onChange={handleChange}
@@ -177,51 +133,6 @@ export default function SignUp( {showSnack, open, close} ) {
                       )
                     }
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Contraseña"
-                  type="password"
-                  autoComplete
-                  value={formData.password}
-                  onChange={handleChange}
-                  error={!!errorMessages.password}
-                  helperText={
-                  errorMessages.password ? (
-                        <TinyText sx={{ color: 'red' }}>{errorMessages.password}</TinyText>
-                      ) : (
-                        <TinyText sx={{ color: 'green' }}>
-                          Por favor proporcione una contraseña.
-                        </TinyText>
-                      )
-                    }
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Confirmar Contraseña"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  error={!!errorMessages.confirmPassword}
-                  helperText={
-                    errorMessages.confirmPassword ? (
-                        <TinyText sx={{ color: 'red' }}>{errorMessages.confirmPassword}</TinyText>
-                      ) : (
-                        <TinyText sx={{ color: 'green' }}>
-                          Por favor proporcione una contraseña confirmada.
-                        </TinyText>
-                      )
-                    }
-                />
-              </Grid>
-            </Grid>
             <Box sx={{
                 marginTop: 3,
                 display: 'flex',

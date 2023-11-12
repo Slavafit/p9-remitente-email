@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import _ from 'lodash';
 import axios from 'axios';
-import { addTokenToHeaders } from "../service/AuthUser";
+import { addTokenToHeaders } from "../service/addTokenToHeaders";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import ControlPointIcon from '@mui/icons-material/ControlPoint';

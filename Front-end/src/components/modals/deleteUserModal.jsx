@@ -4,18 +4,18 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 const DeleteUserModal = ({ deleteOpen, deleteClose, onDelete }) => {
   return (
     <Dialog open={deleteOpen} onClose={deleteClose}>
-      <DialogTitle>Delete User</DialogTitle>
+      <DialogTitle>Borrar usuario</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this user? <br />This action cannot be undone.
+          ¿Estás seguro de que deseas eliminar este usuario? <br />Esta acción no se puede deshacer.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={deleteClose} color="primary">
-          Cancel
+          Cancelar
         </Button>
         <Button onClick={onDelete} color="primary">
-          Delete
+          Borrar
         </Button>
       </DialogActions>
     </Dialog>

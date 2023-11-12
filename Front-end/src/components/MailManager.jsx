@@ -19,7 +19,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import axios from 'axios';
 import Stack from '@mui/material/Stack';
-import { addTokenToHeaders } from "../service/AuthUser";
+import { addTokenToHeaders } from "../service/addTokenToHeaders";
 
 
 

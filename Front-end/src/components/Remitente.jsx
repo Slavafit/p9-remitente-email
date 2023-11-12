@@ -7,7 +7,7 @@ import {Select, FormControl, InputLabel, OutlinedInput, MenuItem, Stack} from '@
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import Fab from '@mui/material/Fab';
-import { addTokenToHeaders } from "../service/AuthUser";
+import { addTokenToHeaders } from "../service/addTokenToHeaders";
 import axios from 'axios';
 
 

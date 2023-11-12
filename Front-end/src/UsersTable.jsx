@@ -8,9 +8,9 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import EditModal from "./components/modals/editUserModal";
+import EditModalAdmin from "./components/modals/editUserAdmin";
 import DeleteUserModal from "./components/modals/deleteUserModal"
-import { addTokenToHeaders } from './service/AuthUser';
+import { addTokenToHeaders } from './service/addTokenToHeaders';
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Paper from '@mui/material/Paper';
@@ -61,11 +61,12 @@ export default function UsersTable( {showSnack, open, close} ) {
     setShowEditModal(true);
   };
 
-  const handleSaveUser = async (newUsername, newEmail) => {
+  const handleSaveUser = async (newUsername, newEmail, newRol) => {
     try {
       const userData = {
         username: newUsername,
         email: newEmail,
+        roles: newRol
       };
       addTokenToHeaders();
       const response = await axios.put(
@@ -123,7 +124,7 @@ export default function UsersTable( {showSnack, open, close} ) {
   return (
     <>
       <Dialog open={open} onClose={close}>
-      <DialogTitle>Users</DialogTitle>
+      <DialogTitle>Usuarios</DialogTitle>
         <DialogContent sx={{height: 'auto', width: '100%', padding: 3, backgroundColor: 'grey.100'}}>
           <Paper sx={{boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)', backgroundColor: 'grey.300'}}>
             <TableContainer>
@@ -184,12 +185,12 @@ export default function UsersTable( {showSnack, open, close} ) {
             variant="outlined"
             onClick={close} 
             color="success">
-              Cancel
+              Cancelar
             </Button>
           </DialogActions>
       </DialogContent>
     </Dialog>
-    <EditModal
+    <EditModalAdmin
         editOpen={showEditModal}
         handleClose={() => setShowEditModal(false)}
         onSubmit={handleSaveUser}

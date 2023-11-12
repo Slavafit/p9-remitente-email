@@ -12,7 +12,7 @@ const ImageModal = ({ modalOpen, imageUrl, handleClose }) => {
         transform: 'translate(-50%, -50%)',
         }}
         >
-        <img src={imageUrl} alt="Modal image" width="50%" height="auto" />
+        <img src={imageUrl} alt="Modal image" width="60%" height="auto" />
       </Box>
     </Modal>
   );

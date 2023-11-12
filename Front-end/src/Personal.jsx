@@ -11,7 +11,7 @@ import axios from "axios";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import LockResetIcon from '@mui/icons-material/LockReset';
 import DeleteIcon from "@mui/icons-material/Delete";
-import { addTokenToHeaders } from "./service/AuthUser";
+import { addTokenToHeaders } from "./service/addTokenToHeaders";
 import EditModal from "./components/modals/editUserModal";
 import DeleteUserModal from "./components/modals/deleteUserModal";
 import ChangePasswordModal from "./components/modals/changePassModal";
@@ -91,7 +91,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     };
 
 
-    //Reset password
+    //Change password
     const handleResetPass = (user) => {
       setSelectedUser(user);
       setResetOpen(true);

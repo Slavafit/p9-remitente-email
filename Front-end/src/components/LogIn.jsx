@@ -6,6 +6,7 @@ import Container from "@mui/material/Container";
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Link from '@mui/material/Link';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -13,8 +14,9 @@ import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/donbosco_logo.png";
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import {useAuth} from '../service/AuthContext'
-import { authUser } from '../service/AuthUser'
+import { useAuth } from '../service/AuthContext'
+import ForgotPassword from '../service/ForgotPassword';
+import axios from 'axios';
 
 
 const WallPaper = styled('div')(({ theme }) => ({
@@ -59,9 +61,11 @@ export default function LogIn() {
     const [rememberMe, setRememberMe] = useState(false);
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [isPassValid, setIsPassValid] = useState(false);
+    const [resetOpen, setResetOpen] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
+    const { showSnack } = useAuth();
 
     useEffect(() => {
         // есть ли сохраненные данные в localStorage
@@ -83,14 +87,13 @@ export default function LogIn() {
 
     // Эффект для отслеживания изменений в поле пароль
     useEffect(() => {
-        const passPattern = /^[a-zA-Z0-9.-]{4,20}$/;
+        const passPattern = /^[a-zA-Z0-9.-]{6,20}$/;
         setIsPassValid(passPattern.test(password));
     }, [password]);
 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
         try {
           const auth = await authUser(email, password);
           
@@ -117,7 +120,48 @@ export default function LogIn() {
         }
       };
 
+
+    // Функция для аутентификации пользователя
+  const authUser = async (email, password) => {
+    try {
+      // Проверить, есть ли токен в sessionStorage
+      const storedToken = sessionStorage.getItem('token');
+      if (storedToken) {
+        // Если токен уже есть в localStorage, используйте его для аутентификации
+        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+        return true;
+        } else {
+        // Отправить запрос на сервер с именем пользователя и паролем
+        const response = await axios.post('http://localhost:5000/login', {
+          email,
+          password,
+        });
+        console.log("response",response);
+        // Получить JWT-токен и прочее из ответа сервера
+        const token = response.data.token;
+        const userId = response.data.userData.userId;
+        const username = response.data.userData.username;
+        const userRole = response.data.userData.role;
+        // Сохранить токен и остальное в sessionStorage или в памяти приложения
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('userId', userId);
+        sessionStorage.setItem('username', username);
+        sessionStorage.setItem('userRole', userRole);
+        sessionStorage.setItem('userRole', userRole);
+        // Вернуть успех
+        return true;
+      }
+    } catch (error) {
+      // Вернуть ошибку аутентификации
+      const response = error.response.data.message
+      console.log("Error authUser", response);
+      showSnack('warning', response);
+      return false;
+    }
+  };
+
   return (
+    <>
     <Grid theme={theme} container component="main" sx={{ height: '100vh' }}>
       <CssBaseline />
         <WallPaper >
@@ -141,11 +185,8 @@ export default function LogIn() {
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
+                  label="Email"
                   name="email"
-                  autoComplete="email"
-                  autoFocus
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -163,10 +204,8 @@ export default function LogIn() {
                   required
                   fullWidth
                   name="password"
-                  label="Password"
+                  label="Contraseña"
                   type="password"
-                  id="password"
-                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -181,7 +220,7 @@ export default function LogIn() {
                 )}
                   <FormControlLabel
                     control={<Checkbox value="remember" color="primary" />}
-                    label="Remember me"
+                    label="Acuérdate de mí"
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
                   />
@@ -193,22 +232,42 @@ export default function LogIn() {
                   endIcon={<VpnKeyIcon />}
                   disabled={!isEmailValid || !isPassValid ||!email || !password}
                 >
-                  Sign In
+                  Iniciar sesión
                 </Button>
+                <Link
+                  sx={{ 
+                    variant: 'body2',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    color: "black",
+                    fontSize: '0.8rem',
+                    cursor: 'pointer'
+                  }}
+                  onClick={()=>{setResetOpen(true)}}
+                >
+                  ¿Has olvidado tu contraseña?
+                </Link>
               </Box>
             </Box>
             <Typography sx={{
                 marginTop: 0,
                 textAlign: "center",
                 opacity: 0.8
-              }}>Fundación Don Bosco © 
+              }}>©{' '}{new Date().getFullYear()}
                 {' '}
-                {new Date().getFullYear()}
-                {'.'}
+                Fundación Don Bosco
+                {'  '}
+                Salesianos Social
               </Typography> 
             </Widget>
           </Container>
         </WallPaper>
     </Grid>
+    <ForgotPassword
+      open={resetOpen}
+      close={()=>{setResetOpen(false)}}
+    />
+    </>
   );
 }

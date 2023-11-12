@@ -26,7 +26,7 @@ import AddEventModal from "./modals/addEventModal"
 import EditEnventModal from "./modals/editEventModal"
 import DeleteEventModal from "./modals/deleteEventModal"
 import axios from "axios";
-import { addTokenToHeaders } from "../service/AuthUser";
+import { addTokenToHeaders } from "../service/addTokenToHeaders"; 
 import ImageModal from "./modals/imageModal";
 
 const StyledFab = styled(Fab)({

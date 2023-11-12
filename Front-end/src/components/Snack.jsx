@@ -2,12 +2,9 @@ import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import AlertTitle from '@mui/material/AlertTitle';
 import Alert from '@mui/material/Alert';
-import { useTheme } from '@mui/material/styles';
-
 
 
   export default function Snack({ snackOpen, handleClose, title, message }) {
-    const theme = useTheme();
 
     let severity = 'success';
     if (title === 'warning') {
@@ -15,7 +12,6 @@ import { useTheme } from '@mui/material/styles';
     } else if (title === 'error') {
       severity = 'error';
     }
-
 
     return(
         <Stack spacing={2} sx={{ width: '100%' }}>

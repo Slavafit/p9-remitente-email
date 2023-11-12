@@ -11,6 +11,7 @@ const { validationResult } = require('express-validator')
 // const {secret} = require('./config')
 require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
+const { uuid } = require('uuidv4');
 
 const generateAccessToken = (id, roles) => {
     const payload = {
@@ -28,7 +29,7 @@ cloudinary.config({
 
 class controller {
 
-
+    //регистрация пользователя
     async registration(req, res) {
         try {
             const errors = validationResult(req);
@@ -76,8 +77,8 @@ class controller {
             console.log(e)
             res.status(400).json({message: 'Registration error', error: e.message })
         }
-    }
-
+    };
+    //ввход пользователя
     async login(req, res) {
         try {
             const { email, password } = req.body   //получили данные от клиента
@@ -87,7 +88,7 @@ class controller {
             const user = await UserModel.findOne({email: lowerCaseEmail })
             //если не найден, то объект будет пустой и пойдет по условию ниже
             if (!user) {
-                return res.status(404).json({message: `Usuario con ${email} extraviado`})
+                return res.status(404).json({message: `El usuario con ${email} no existe`})
             }
             //расшифровываю пароль клиента при помощи compareSync
             const validPassword = bcrypt.compareSync(password, user.password)
@@ -102,10 +103,10 @@ class controller {
             console.log(e)
             res.status(400).json({message: 'Login errorError de inicio de sesión'})
         }
-    }
+    };
 
 
-
+    //получить список пользователей
     async getUsers(req, res) {
         try {
             // console.log("Received getUsers");
@@ -115,8 +116,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
-
+    };
     async getUserByUsername(req, res) {
         try {
             const { username } = req.query;
@@ -131,8 +131,8 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
-
+    };
+    //Обработчик обновления пользователя
     async updateUser(req, res) {
         try {
             const errors = validationResult(req);
@@ -158,8 +158,8 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
-    // Обработчик для сброса пароля
+    };
+    // Обработчик для смены пароля
     async changePassword(req, res) {
         try {
             const errors = validationResult(req);
@@ -207,7 +207,7 @@ class controller {
                 
                 <h4>Tu nueva contraseña: ${newPassword}</h4>
                 
-                <p>Esta carta no requiere respuesta..<p>`
+                <p>Esta carta no requiere respuesta.<p>`
             }
             mailer(mailMessage);
 
@@ -217,6 +217,107 @@ class controller {
             res.status(500).json({ message: 'Server error' });
         }
     }
+    // Обработчик для создания ссылки сброса пароля
+    async forgotPassword(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = errors.array().map(error => ({
+            
+                  message: error.msg,
+                }));
+                return res.status(400).json({errors: errorMessages });
+            }
+            const { email } = req.body; // обновленные данные из тела запроса
+            // console.log(email)
+            //ищем пользователя в базе
+            const user = await UserModel.findOne({email: email})
+            //если не найден, то объект будет пустой и пойдет по условию ниже
+            if (!user) {
+                return res.status(404).json({message: `Usuario no encontrado`})
+            }
+            const token = uuid(); // генерируем случайный токен
+            const expires = Date.now() + 1800000; // ссылка будет действительна в течение 0.5 часа
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = expires;
+            await user.save();
+
+            const link = `${process.env.APP_URL}/resetpassword/reset/${user._id}/${token}`;
+            const mailMessage = {
+                from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
+                to: `${user.email}`,
+                subject: `Recuperar su contraseña en el sitio web "Remitente de invitaciones"`,
+                html: `
+                <h2>Usted u otra persona ha solicitado un restablecimiento de contraseña <br> para su dirección de correo electrónico.</h2>
+                
+                <h4>Sige este enlace para restablecer su contraseña: <a href="${link}">aquí</a></h4>
+                <p>Periodo de validez: 30 minutos.<p>
+
+                <p>Si no fue Usted, simplemente ignore esta carta.<p>`
+            }
+            mailer(mailMessage);
+
+            res.json({message:'El enlace se ha enviado a su correo electrónico'});
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    };
+    // Обработчик для смены пароля
+    async resetPassword(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                // Если есть ошибки валидации
+                const errorMessages = errors.array().map(error => ({
+            
+                  message: error.msg,
+                }));
+                return res.status(400).json({errors: errorMessages });
+            }
+            const { id, token } = req.params;
+            const { password } = req.body;
+            // console.log("userId:",id,token,"password",password)
+            //ищем пользователя в базе
+            const user = await UserModel.findOne({
+                _id: id, 
+                resetPasswordToken: token, 
+                resetPasswordExpires: { $gt: Date.now() } 
+            });
+            if (!user) {
+              return res.status(400).json({ message: 'Token de reinicio no válido o caducado' });
+            }    
+                    //если не найден, то объект будет пустой и пойдет по условию ниже
+            const hashPassword = bcrypt.hashSync(password, 7);  //захешировали пароль
+            await UserModel.findByIdAndUpdate(
+                id, 
+                {
+                    password: hashPassword, 
+                    resetPasswordToken: undefined,
+                    resetPasswordExpires: undefined
+                },
+                { new: true }
+            );
+            const mailMessage = {
+                from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
+                to: `${user.email}`,
+                subject: `Aviso de cambio de contraseña en el sitio web "Remitente de invitaciones"`,
+                html: `
+                <h2>Felicidades, Usted ha completado el procedimiento de restablecimiento de contraseña</h2>
+                
+                <h4>La nueva contraseña es: ${password}</h4>
+                
+                <p>Esta carta no requiere respuesta.<p>`
+            }
+            mailer(mailMessage);
+
+            res.json({ message: 'Contraseña se ha restablecido' });
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: 'Server error' });
+        }
+    };
     // Обработчик для удаления User по Id
     async deleteUser(req, res) {
         try {
@@ -235,8 +336,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
-
+    };
 
 
     // Обработчик создания записи в MailList
@@ -322,7 +422,7 @@ class controller {
                         );
                     })
                     .then(() => {
-                        console.log('Flag isSent updated successfully');
+                        console.log('Flag isSent is true');
                     })
                     .catch(err => {
                         // Обработка ошибок
@@ -330,13 +430,12 @@ class controller {
                     });
                 }
             }
-            res.status(201).json({ message: `MailList with event "${eventName}" created successfully` });
+            res.status(201).json({ message: `MailList con evento "${eventName}" creado exitosamente` });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'createMailList error', message: error.message });
         }
     };
-
     //Обработчик добавления записей в MailList
     async patchMailList(req, res) {
         try {
@@ -432,7 +531,6 @@ class controller {
             res.status(500).json({ error: 'createMailList error', message: error.message });
         }
     };
-      
     // Обработчик обновления записи MailList
     async updateMailList(req, res) {
         try {
@@ -451,7 +549,7 @@ class controller {
             console.error(e);
             res.status(500).json({ message: 'Server error' });
         }
-  }
+    };
     // Обработчик получения mailList
     async getMailList(req, res) {
         try {
@@ -462,7 +560,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик получения ответов
     async responseMailList(req, res) {
         try {
@@ -487,7 +585,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
 
 
 
@@ -501,7 +599,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик создания event
     async createEvent(req, res) {
         try {
@@ -538,7 +636,7 @@ class controller {
             console.log(e)
             res.status(500).json({error: 'PostEvent error', message: e.message})
         }
-    }
+    };
     // Обработчик обновления event    
     async updateEvent(req, res) {
         try {
@@ -554,7 +652,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик удаления event
     async deleteEvent(req, res) {
         const eventId = req.params.id;
@@ -569,7 +667,7 @@ class controller {
             console.error(error);
             res.status(500).json({ message: 'Error deleting event' });
           }
-        }            
+    };        
     
     
     // Обработчик получения Contact
@@ -581,7 +679,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик создания Contact
     async createContact(req, res) {
         try {
@@ -618,7 +716,7 @@ class controller {
             console.log(e)
             res.status(500).json({error: 'createContact error', message: e.message})
         }
-    }
+    };
     // Обработчик обновления Contact  
     async updateContact(req, res) {
         try {
@@ -643,7 +741,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик удаления Contact
     async deleteContacts(req, res) {
         const contactId = req.params.id;
@@ -658,7 +756,7 @@ class controller {
           console.error(error);
           res.status(500).json({ message: 'Server error' });
         }
-      }
+    };
 
 
         
@@ -675,7 +773,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик создания list
     async createList(req, res) {
             try {
@@ -712,7 +810,7 @@ class controller {
                 console.log(e)
                 res.status(500).json({error: 'PostList error', message: e.message})
             }
-    }
+    };
     // Обработчик обновления list    
     async updateList(req, res) {
         try {
@@ -741,7 +839,7 @@ class controller {
             console.log(e)
             res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик частичного обновления значений массивов
     async patchList(req, res) {
         try {
@@ -780,7 +878,7 @@ class controller {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
         }
-    }
+    };
     // Обработчик удаления list
     async deleteListValues(req, res) {
         const { _id, provincia, entidad, categoria, territorio } = req.body;
@@ -810,7 +908,7 @@ class controller {
           console.error(error);
           res.status(500).json({ message: 'Server error' });
         }
-      }
+    };
       
 }
 
