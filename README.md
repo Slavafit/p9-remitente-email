@@ -66,7 +66,7 @@ el correo electrónico y la función del usuario. También puede eliminar un usu
 
 ## Installation Process ⬆️
 
-1. Clone the GitHub repository: [https://github.com/Slavafit/P8-react-player.git](https://github.com/Slavafit/p9-remitente-email.git)
+1. Clone the GitHub repository: [p9-remitente-email](https://github.com/Slavafit/p9-remitente-email.git)
 2. Open the file using Microsoft Visual Studio 2022.
 3. en consola acceder a la carpeta del proyecto, npm install
 4. en la carpeta Back-end npm start
