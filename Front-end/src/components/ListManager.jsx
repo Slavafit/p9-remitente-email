@@ -57,7 +57,7 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
     try {
       setLoading(true);
       addTokenToHeaders();
-      const response = await axios.get(`http://localhost:5000/lists`);
+      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/lists`);
       let fetchedLists = response.data[0]; // Получаем первый объект из массива
       // console.log("get",fetchedLists);
       setLists(fetchedLists);
@@ -90,14 +90,17 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
         _id: lists._id,
         [listName]: [...lists[listName], newItems[listName]] // Добавить новый элемент к массиву
       };
-      // console.log("post-patch",listName)
-      const response = await axios.patch(`http://localhost:5000/lists/`,updatedList);
+      // console.log("post-patch",updatedList)
+      const response = await axios.patch(`https://p9-remitente.oa.r.appspot.com/lists/`,updatedList);
+      console.log(response.data);
       let responseData = response.data.message;
       showSnack('success', responseData);
+      setTimeout(() => {
+        fetchLists();
+      }, 1000);
     } catch (error) {
       if ( error.response.data && error.response.data.message) {
         const resError = error.response.data.message;
-        // showSnack(resError);
         showSnack('warning', resError);
     } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
         const resError = error.response.data.errors[0].message;
@@ -134,7 +137,7 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
       const { listName, newValue, itemIndex } = editItem;
           // Обновление массива
         updatedData[listName][itemIndex] = newValue;
-      await axios.put(`http://localhost:5000/lists/`, updatedData);
+      await axios.put(`https://p9-remitente.oa.r.appspot.com/lists/`, updatedData);
       showSnack(`"${newValue}" edited in "${listName}"`);
       setTimeout(() => {
         fetchLists();
@@ -157,7 +160,7 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
         const valueToDelete = updatedData[listName][itemIndex];
         updatedData[listName] = updatedData[listName].filter((_, index) => index !== itemIndex);
         // console.log("updatedData after deletion:",updatedData);
-        const response = await axios.put(`http://localhost:5000/lists/`, updatedData);
+        const response = await axios.put(`https://p9-remitente.oa.r.appspot.com/lists/`, updatedData);
         if (response.status === 200) {
           setDelOpen(false);
           showSnack(`Value "${valueToDelete}" from "${listName}" was deleted`);
@@ -186,13 +189,13 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
     >
       <Paper elevation={3} sx={{ backgroundColor: 'grey.300' }}>
         <FormControl sx={{ m: 1, width: 200 }}>
-          <InputLabel id="list-name">Select List</InputLabel>
+          <InputLabel id="list-name">Seleccionar lista</InputLabel>
           <Select
             labelId="list-name"
-            title="Select list"
+            title="Seleccionar lista"
             value={editItem.listName}
             onChange={(event) => setEditItem({ ...editItem, listName: event.target.value, newValue: '' })}
-            input={<OutlinedInput label="Select List" />}
+            input={<OutlinedInput label="Seleccionar lista" />}
             MenuProps={MenuProps}
           >
             {Object.keys(lists).filter(key => Array.isArray(lists[key])).map((listName) => (
@@ -205,13 +208,13 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
         {/* добавление нового */}
         {editItem.listName && (
           <FormControl sx={{ m: 1, width: 200 }}>
-            <InputLabel id="selected-list">Select Value</InputLabel>
+            <InputLabel id="selected-list">Seleccionar Value</InputLabel>
             <Select
-              title="Select value"
+              title="Seleccionar value"
               labelId="selected-value"
               value={editItem.newValue}
               onChange={(event) => handleEditChange(event)}
-              input={<OutlinedInput label="Select Value" />}
+              input={<OutlinedInput label="Seleccionar Value" />}
               MenuProps={MenuProps}
             >
               {lists[editItem.listName].map((name, index) => (
@@ -232,28 +235,27 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
           labelId="selected-value"
           value={newItems[editItem.listName]}
           onChange={handleNewChange(editItem.listName)}
-          label={`New value in ${editItem.listName}`}
+          label={`Nuevo valor en ${editItem.listName}`}
         />
-          <IconButton title="Add item">
+          <IconButton title="Añadir artículo">
             <ControlPointIcon onClick={handleAddItem(editItem.listName)}/>
           </IconButton>
         {/* <Button title="Add item" onClick={handleAddItem(editItem.listName)}>Add Item</Button> */}
         </FormControl>
         {/* редактирование */}
         <FormControl sx={{ m: 1, width: 200 }}>
-
         <TextField
           value={editItem.newValue}
           onChange={handleEditChange}
-          label={`Edit value item ${editItem.listName}`}
+          label={`Editar elemento de valor ${editItem.listName}`}
         />
-          <IconButton title="Edit item">
+          <IconButton title="Editar elemento de valor">
             <EditRoundedIcon onClick={handleEditItem}/>
           </IconButton>
         </FormControl>
 
           <IconButton sx={{ m: 1, ml: 6 }} size="large"
-            title="Delete item" onClick={()=>{setDelOpen(true)}}>
+            title="Delete elemento de valor" onClick={()=>{setDelOpen(true)}}>
             <DeleteIcon />
           </IconButton>
 

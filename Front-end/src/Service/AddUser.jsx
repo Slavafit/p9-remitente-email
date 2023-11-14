@@ -84,7 +84,7 @@ export default function SignUp( {showSnack, open, close} ) {
       try {
         addTokenToHeaders();
         const response = await axios.post(
-          "http://localhost:5000/registration", formData);
+          "https://p9-remitente.oa.r.appspot.com/registration", formData);
         let responseMessage = response.data.message;
         showSnack('success', responseMessage);
         close();
@@ -229,30 +229,23 @@ export default function SignUp( {showSnack, open, close} ) {
                 alignItems: 'center',
                 }}>
             </Box>
-            <Grid item xs={12} sm={6} 
-                sx={{ mt: 2, mb: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'}}
-                >
-              <Button
-                type="submit"
-                variant="outlined"
-                endIcon={<SendIcon />}
-              >
-                Enviar
-              </Button>
-            </Grid>
           </Box>
         </Box>
-      <DialogActions sx={{flexDirection: 'column', gap:2, my:2}}>
+        <DialogActions sx={{flexDirection: 'row', gap:2, my:2}}>
           <Button 
-          variant="outlined"
-          onClick={close} 
-          color="success"
-          endIcon={<CloseIcon />}
-          >
+            variant="outlined"
+            onClick={close} 
+            color="success"
+            endIcon={<CloseIcon />}
+            >
             Cancelar
+          </Button>
+          <Button
+            type="submit" 
+            variant="outlined"
+            endIcon={<SendIcon />}
+          >
+            Enviar
           </Button>
         </DialogActions>
       </DialogContent>

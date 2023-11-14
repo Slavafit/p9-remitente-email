@@ -43,7 +43,7 @@ export default function UsersTable( {showSnack, open, close} ) {
   const fetchUsers = async () => {
     try {
       addTokenToHeaders();
-      const response = await axios.get("http://localhost:5000/users");
+      const response = await axios.get("https://p9-remitente.oa.r.appspot.com/users");
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -70,7 +70,7 @@ export default function UsersTable( {showSnack, open, close} ) {
       };
       addTokenToHeaders();
       const response = await axios.put(
-        `http://localhost:5000/users/?_id=${selectedUser._id}`, 
+        `https://p9-remitente.oa.r.appspot.com/users/?_id=${selectedUser._id}`, 
         userData
         );
       showSnack(`New username: "${response.data.username}", new email: ${response.data.email}`);
@@ -96,7 +96,7 @@ export default function UsersTable( {showSnack, open, close} ) {
       try {
         addTokenToHeaders();
         const response = await axios.delete(
-          `http://localhost:5000/users/?_id=${userDeleteId._id}`
+          `https://p9-remitente.oa.r.appspot.com/users/?_id=${userDeleteId._id}`
           );
         if (response.status === 200) {
           showSnack(`"${userDeleteId.username}" was deleted successfully`);

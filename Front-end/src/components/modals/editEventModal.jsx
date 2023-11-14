@@ -8,24 +8,24 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
 
-const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip, initImage, initStartDate, initAdress }) => {
+const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip, initImage, initStartDate, initAddress }) => {
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
   const [image, setImage] = useState('');
   const [startDate, setStartDate] = useState('');
-  const [adress, setAdress] = useState('');
+  const [adress, setAddress] = useState('');
 
   useEffect(() => {
     setName(initName);
     setDesc(initDescrip);
     setImage(initImage);
     setStartDate(initStartDate);
-    setAdress(initAdress);}, 
+    setAddress(initAddress);}, 
     [initName],
     [initDescrip],
     [initImage],
     [initStartDate],
-    [initAdress]
+    [initAddress]
   );
 
     // Обработчик изменения значения name
@@ -49,7 +49,7 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
   
 
     const handleAdressChange = (event) => {
-      setAdress(event.target.value);
+      setAddress(event.target.value);
     };
     
 
@@ -63,65 +63,71 @@ const EditEnventModal = ({ editOpen, editClose, onSubmit, initName, initDescrip,
 
   return (
     <Dialog open={editOpen} onClose={editClose}>
-      <DialogTitle>Edit event</DialogTitle>
-      <Paper sx={{
-                  m:3,
-                  padding: 2,
-                  borderRadius: 5,
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)', 
-                  backgroundColor: 'grey.300'
-                  }}>
-      <DialogContent>
-        <DialogContentText>Enter the new event details:</DialogContentText>
-        <TextField
-        sx={{ margin: 1 }}
-        label="name" 
-        type="text"
-        fullWidth
-        value={name}
-        onChange={handleNameChange}
-        />
-        <TextField
-        sx={{ margin: 1 }}
-        label="description" 
-        fullWidth
-        value={desc}
-        onChange={handleDiscChange}
-        />
-        <TextField
+      <DialogContent sx={{padding: 3, backgroundColor: 'grey.300'}}>
+        <DialogTitle>Editar evento</DialogTitle>
+        <Paper sx={{
+              
+              padding: 1,
+              borderRadius: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'left',
+              gap: '20px',
+              bgcolor: "Menu",
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)' 
+                    }}>
+        <DialogContent>
+          <DialogContentText sx={{ m:2}}>Ingrese los detalles del nuevo evento:</DialogContentText>
+          <TextField
           sx={{ margin: 1 }}
+          label="Nombre del evento" 
           type="text"
-          label="Image URL" 
           fullWidth
-          value={image}
-          onChange={handleImageChange}
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-          <DesktopDateTimePicker
-            sx={{ width: '100%', margin: 1 }}
-            label="New Date and Time"
-            value={dayjs(startDate)}
-            onChange={handleStartDateChange}
+          value={name}
+          onChange={handleNameChange}
           />
-        </LocalizationProvider>
-        <TextField
-          sx={{ margin: 2 }}
-          label="Adress" 
+          <TextField
+          sx={{ margin: 1 }}
+          label="descripción del evento" 
           fullWidth
-          type="adress"
-          value={adress}
-          onChange={handleAdressChange}
-        />
+          value={desc}
+          onChange={handleDiscChange}
+          />
+          <TextField
+            sx={{ margin: 1 }}
+            type="text"
+            label="Imagen URL" 
+            fullWidth
+            value={image}
+            onChange={handleImageChange}
+          />
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+            <DesktopDateTimePicker
+              sx={{ width: '100%', margin: 1 }}
+              label="Nueva fecha y hora"
+              value={dayjs(startDate)}
+              onChange={handleStartDateChange}
+            />
+          </LocalizationProvider>
+          <TextField
+            sx={{ width: '100%', margin: 1 }}
+            label="Dirección" 
+            fullWidth
+            type="adress"
+            value={adress}
+            onChange={handleAdressChange}
+          />
+        </DialogContent>
+        </Paper>
+        <DialogActions sx={{mt:1}}>
+          <Button onClick={editClose} variant="outlined" color="success">
+            Cancelar
+          </Button>
+          <Button onClick={() => onSubmit(eventData)} variant="outlined" color="primary">
+            Guardar
+          </Button>
+        </DialogActions>
       </DialogContent>
-      </Paper>
-      <DialogActions>
-        <Button onClick={editClose} variant="outlined" color="success">
-          Cancel
-        </Button>
-        <Button onClick={() => onSubmit(eventData)} variant="outlined" color="success">
-          Save
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

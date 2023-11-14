@@ -49,7 +49,7 @@ function ResetPasswordPage () {
     event.preventDefault(); // Предотвращаем отправку формы по умолчанию
     const form = event.currentTarget;
       try {
-        const response = await axios.post(`http://localhost:5000/resetpassword/reset/${userId}/${token}`, { password });
+        const response = await axios.post(`https://p9-remitente.oa.r.appspot.com/resetpassword/reset/${userId}/${token}`, { password });
         
         console.log(response.data.message);
         showSnack('success', response.data.message);

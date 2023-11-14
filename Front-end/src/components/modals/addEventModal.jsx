@@ -65,7 +65,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
   return (
     <Dialog open={open} onClose={close}>
       <DialogContent sx={{padding: 3, backgroundColor: 'grey.300'}}>
-        <DialogTitle>Add Event</DialogTitle>
+        <DialogTitle>Añadir un evento</DialogTitle>
           <DialogContent
             sx={{
               padding: 3,
@@ -78,7 +78,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'
               }}
             >
-            <DialogContentText sx={{mt:1}}>Fill in the fields for the new event:</DialogContentText>
+            <DialogContentText sx={{mt:1}}>Complete los campos para el nuevo evento:</DialogContentText>
             <TextField
               required
               label="Event Name"
@@ -88,7 +88,7 @@ const AddEventModal = ({ open, onSubmit, close }) => {
               onChange={handleInputChange}
             />
             <TextField
-              label="Event description"
+              label="Evento descripción"
               name="description"
               type="Textarea"
               value={eventData.description}
@@ -96,21 +96,21 @@ const AddEventModal = ({ open, onSubmit, close }) => {
             />
             <TextField
               required
-              label="Event Image"
+              label="Evento Imagen"
               type="file"
               accept="image/*,.png,.jpeg,.jpg,.web,.pdf"
               onChange={handleImageChange}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="DE">
               <DesktopDateTimePicker
-                label="Start Date and Time"
+                label="Fecha y hora de inicio"
                 value={eventData.startDate}
                 onChange={(newDate) => handleDateTimeChange(newDate, 'startDate')}
                 renderInput={(params) => <TextField {...params} />}
                 />
             </LocalizationProvider>
             <TextField
-              label="Event adress"
+              label="Dirección del evento"
               name="adress"
               type="Text"
               value={eventData.adress}
@@ -119,10 +119,10 @@ const AddEventModal = ({ open, onSubmit, close }) => {
           </DialogContent>
         <DialogActions sx={{mt:1}}>
           <Button onClick={close} variant="outlined" color="success" >
-            Cancel
+            Cancelar
           </Button>
-          <Button onClick={handleAddClick} variant="outlined" color="success">
-            Add
+          <Button onClick={handleAddClick} variant="outlined" color="primary">
+            Añadir
           </Button>
         </DialogActions>
       </DialogContent>

@@ -17,6 +17,9 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { useAuth } from '../service/AuthContext'
 import ForgotPassword from '../service/ForgotPassword';
 import axios from 'axios';
+import IconButton from "@mui/material/IconButton";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 
 const WallPaper = styled('div')(({ theme }) => ({
@@ -62,6 +65,7 @@ export default function LogIn() {
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [isPassValid, setIsPassValid] = useState(false);
     const [resetOpen, setResetOpen] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
@@ -132,7 +136,7 @@ export default function LogIn() {
         return true;
         } else {
         // Отправить запрос на сервер с именем пользователя и паролем
-        const response = await axios.post('http://localhost:5000/login', {
+        const response = await axios.post('https://p9-remitente.oa.r.appspot.com/login', {
           email,
           password,
         });
@@ -159,6 +163,10 @@ export default function LogIn() {
       return false;
     }
   };
+    //обработчик отображения пароля
+    const handlePasswordVisibility = () => {
+      setShowPassword(!showPassword);
+    };
 
   return (
     <>
@@ -205,9 +213,20 @@ export default function LogIn() {
                   fullWidth
                   name="password"
                   label="Contraseña"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={handlePasswordVisibility}
+                        edge="end"
+                        title="monstrar la conrtaseña"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    ),
+                  }}
                 />
                   {isPassValid ? (
                   <TinyText sx={{ color: 'green' }}>

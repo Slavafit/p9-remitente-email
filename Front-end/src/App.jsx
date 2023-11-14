@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import Home from './Home'
 import LogIn from './components/LogIn';
 import PageNotFound from './PageNotFound';
@@ -18,12 +18,13 @@ const ProtectedRoute = ({ element }) => {
   const navigate = useNavigate();
 
 
-  if (!auth) {
-    navigate('/'); // Перенаправить на страницу входа, если пользователь не авторизован
-    return null;
-  }
+  useEffect(() => {
+    if (!auth) {
+      navigate('/'); // Перенаправить на страницу входа, если пользователь не авторизован
+    }
+  }, [auth, navigate]);
 
-  return element;
+  return auth ? element : null;
 };
 
 function App() {

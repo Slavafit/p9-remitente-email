@@ -4,18 +4,18 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 const DeleteEventModal = ({ deleteOpen, handleClose, onDelete }) => {
   return (
     <Dialog open={deleteOpen} onClose={handleClose}>
-      <DialogTitle>Delete event</DialogTitle>
+      <DialogTitle>Eliminar evento</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this event? <br />This action cannot be undone.
+          ¿Estás seguro de que deseas eliminar este evento? <br />Esta acción no se puede realizar.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
+        <Button onClick={handleClose} variant="outlined" color="success">
+          Cancelar
         </Button>
-        <Button onClick={onDelete} color="primary">
-          Delete
+        <Button onClick={onDelete} variant="outlined" color="primary">
+          Borrar
         </Button>
       </DialogActions>
     </Dialog>

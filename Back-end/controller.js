@@ -8,10 +8,10 @@ const mailer = require('./mailer');     //импорт настроек
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator')
-// const {secret} = require('./config')
 require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 const { uuid } = require('uuidv4');
+const path = require('path');
 
 const generateAccessToken = (id, roles) => {
     const payload = {
@@ -252,7 +252,7 @@ class controller {
                 <h2>Usted u otra persona ha solicitado un restablecimiento de contraseña <br> para su dirección de correo electrónico.</h2>
                 
                 <h4>Sige este enlace para restablecer su contraseña: <a href="${link}">aquí</a></h4>
-                <p>Periodo de validez: 30 minutos.<p>
+                <p>Periodo de validez: <b>30 minutos</b>.<p>
 
                 <p>Si no fue Usted, simplemente ignore esta carta.<p>`
             }
@@ -379,6 +379,7 @@ class controller {
                 const formattedDate = startDate.toLocaleString();
 
                 if (contactInfo) {
+                    const link = `${process.env.APP_URL}/response/${eventId}/${contact}`;
                     const mailMessage = {
                         from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
                         to: contactInfo.email,
@@ -404,8 +405,8 @@ class controller {
                         <p>Un saludo</p>
 
                         <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
-                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
-                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+                        <a href="${link}/Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
+                        <a href="${link}/No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
                         </body>
                         </html>
                         `,
@@ -498,8 +499,8 @@ class controller {
                         <p>Un saludo</p>
 
                         <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
-                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
-                        <a href="http://localhost:5000/response/?eventId=${eventId}&contactId=${contact}&response=No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+                        <a href="https://p9-remitente.oa.r.appspot.com/response/${eventId}/${contact}/Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
+                        <a href="https://p9-remitente.oa.r.appspot.com/response/${eventId}/${contact}/No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
                         </body>
                         </html>
                         `,
@@ -564,7 +565,7 @@ class controller {
     // Обработчик получения ответов
     async responseMailList(req, res) {
         try {
-            const { eventId, contactId, response } = req.query
+            const { eventId, contactId, response } = req.params
             // console.log("Received responseMailList","eventId",eventId, "contactId",contactId, "response",response );
 
             const mailList = await MailListModel.findOne({event: eventId});
@@ -577,7 +578,10 @@ class controller {
                 foundEntry.response = response;
           
                 await mailList.save();
-                return res.json({ message: 'Respuesta actualizada correctamente' });
+                // return res.json({ message: 'Respuesta actualizada correctamente' });
+                const filePath = path.join(__dirname, 'views', 'welcome.html');
+                return res.sendFile(filePath);
+
               } else {
                 return res.status(404).json({ message: 'Contacto no encontrado' });
               }
@@ -856,12 +860,28 @@ class controller {
             return res.status(400).json({errors: errorMessages });
         }
         const updatedFields = {};
+        let lastElement;
         
-        if (cargo) updatedFields.cargo = cargo;
-        if (provincia) updatedFields.provincia = provincia;
-        if (entidad) updatedFields.entidad = entidad;
-        if (categoria) updatedFields.categoria = categoria;
-        if (territorio) updatedFields.territorio = territorio;
+        if (cargo) {
+          updatedFields.cargo = cargo;
+          lastElement = cargo[cargo.length - 1];
+        }
+        if (provincia) {
+          updatedFields.provincia = provincia;
+          lastElement = provincia[provincia.length - 1];
+        }
+        if (entidad) {
+          updatedFields.entidad = entidad;
+          lastElement = entidad[entidad.length - 1];
+        }
+        if (categoria) {
+          updatedFields.categoria = categoria;
+          lastElement = categoria[categoria.length - 1];
+        }
+        if (territorio) {
+          updatedFields.territorio = territorio;
+          lastElement = territorio[territorio.length - 1];
+        }
     
         const updatedList = await ListModel.findByIdAndUpdate(
             _id,
@@ -872,13 +892,13 @@ class controller {
         if (!updatedList) {
             return res.status(404).json({ message: 'Lista no encontrado' });
         }
-    
-        res.json({ message: 'correctamente' });
+        res.json({ message: `Nuevo valor ${lastElement} agregado exitosamente`});
         } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
         }
     };
+
     // Обработчик удаления list
     async deleteListValues(req, res) {
         const { _id, provincia, entidad, categoria, territorio } = req.body;

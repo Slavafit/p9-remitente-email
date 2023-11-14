@@ -90,7 +90,7 @@ const EditModalAdmin = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
           </Button>
           <Button onClick={() => onSubmit(username, email, rol)} 
           variant="outlined"
-          color="success"
+          color="primary"
           >
             Guardar
           </Button>

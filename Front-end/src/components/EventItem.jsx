@@ -33,7 +33,7 @@ const StyledFab = styled(Fab)({
   position: 'absolute',
   zIndex: 1,
   top: 9,
-  left: "20%",
+  left: "70%",
   right: 0,
   margin: '0 auto',
   display: 'flex',
@@ -161,7 +161,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     try {
       setLoading(true);
       addTokenToHeaders();
-      const response = await axios.get(`http://localhost:5000/events`);
+      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/events`);
       let fetchedEvents = response.data;
       // console.log("EventItem:", fetchedEvents)
       setEvents(fetchedEvents);
@@ -190,7 +190,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       // formData.append('startDate', eventData.startDate);
       // formData.append('endDate', eventData.endDate);
       const response = await axios.post(
-        "http://localhost:5000/events/", eventData, {
+        "https://p9-remitente.oa.r.appspot.com/events/", eventData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -237,7 +237,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         setLoading(true);
         addTokenToHeaders();
         const response = await axios.put(
-          `http://localhost:5000/events/?_id=${selectedEvent._id}`, 
+          `https://p9-remitente.oa.r.appspot.com/events/?_id=${selectedEvent._id}`, 
           eventData);
           let message = response.data.name;
         showSnack(`Evento "${message}" editado correctamente`)
@@ -265,7 +265,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         setLoading(true);
         addTokenToHeaders();
         const response = await axios.delete(`
-        http://localhost:5000/events/${selectedEvent}`);
+        https://p9-remitente.oa.r.appspot.com/events/${selectedEvent}`);
         // let message = response.data.name;
         console.log(response.data);
         setDelOpen(false);
@@ -300,13 +300,17 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'}}>
         <Stack direction="row" spacing={2}>
           <StyledFab title="add event" size="small" color="secondary">
             <AddIcon onClick={() => setAddOpen(true)}/>
           </StyledFab>
         </Stack>
-        <Table sx={{ minWidth: 500, backgroundColor: 'grey.300' }} aria-label="event pagination table">
+        <Table sx={{ 
+            minWidth: 500,
+            backgroundColor: 'grey.300'
+            }} 
+            aria-label="event pagination table">
           <TableHead>
             <TableRow>
               <TableCell>Image</TableCell>
@@ -406,7 +410,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
           initDescrip={selectedEvent ? selectedEvent.description : ""}
           initImage={selectedEvent ? selectedEvent.image : ""}
           initStartDate={selectedEvent ? selectedEvent.startDate : ""}
-          initAdress={selectedEvent ? selectedEvent.adress : ""}
+          initAddress={selectedEvent ? selectedEvent.adress : ""}
         />
         <DeleteEventModal
           deleteOpen={isDelOpen}
