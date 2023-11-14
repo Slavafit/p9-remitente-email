@@ -1,8 +1,7 @@
 # p9-remitente-email
 Proyecto 9 Bootcamp. Full Stack. Aplicación para el envío de invitaciones a contactos con sus respuestas.
 
-	Para acceder a la aplicación, debe haber sido registrado previamente por el administrador. Si no recuerda su contraseña,
- puede recuperarla pulsando el botón recuperar contraseña, se le enviará un enlace de recuperación a su correo electrónico. El enlace es válido durante 30 minutos.
+	Para acceder a la aplicación, debe haber sido registrado previamente por el administrador. Si no recuerda su contraseña, puede recuperarla pulsando el botón recuperar contraseña, se le enviará un enlace de recuperación a su correo electrónico. El enlace es válido durante 30 minutos.
 	Al registrar un usuario, los campos obligatorios son: Nombre de usuario, Email y Contraseña. 
 Estos campos no pueden estar vacíos. El campo Correo electrónico se comprobará si es realmente una dirección de correo electrónico.
 Requisitos de la contraseña: la longitud mínima es de 6 caracteres, la máxima de 20. Se muestran mensajes al usuario en caso de errores de introducción.
