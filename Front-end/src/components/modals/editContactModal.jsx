@@ -75,118 +75,131 @@ const EditContactModal = ({
 
   return (
     <Dialog open={editOpen} onClose={editClose}>
-      <DialogTitle>Edit contact</DialogTitle>
-      <DialogContent sx={{width: 400 }}>
-        <DialogContentText>Enter the new contact details:</DialogContentText>
-        <TextField
-        sx={{ margin: 1 }}
-        label="nombre"
-        name="nombre"
-        fullWidth
-        value={nombre}
-        onChange={handleNombreChange}
-        />
-          <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
-          <InputLabel>Cargo</InputLabel>
-            <Select
-              label="cargo"
-              name="cargo"
-              value={contactData.cargo}
-              onChange={handleCargoChange}
+      <DialogContent sx={{padding: 3, bgcolor: 'grey.300', }}>
+        <DialogTitle>Editar contacto</DialogTitle>
+        <DialogContent
+            sx={{
+              borderRadius: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'left',
+              gap: '10px',
+              bgcolor: "Menu",
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+              m: 2,
+              }}
             >
-              {lists && lists.cargo && lists.cargo.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {item}
-                </MenuItem>
-              ))}
-            </Select>
-            </FormControl>
-          <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
-          <InputLabel>Entidad</InputLabel>
-            <Select
-              label="entidad"
-              name="entidad"
-              value={contactData.entidad}
-              onChange={handleEntidadChange}
-            >
-              {lists && lists.entidad && lists.entidad.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {item}
-                </MenuItem>
-              ))}
-            </Select>
-            </FormControl>
-          <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
-          <InputLabel>Categoria</InputLabel>
-            <Select
-              label="categoria"
-              name="categoria"
-              value={contactData.categoria}
-              onChange={handleCatChange}
-            >
-              {lists && lists.categoria && lists.categoria.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {item}
-                </MenuItem>
-              ))}
-            </Select>
-            </FormControl>
-          <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
-          <InputLabel>Provincia</InputLabel>
-            <Select
-              label="provincia"
-              name="provincia"
-              value={contactData.provincia}
-              onChange={handleProvinciaChange}
-            >
-              {lists && lists.provincia && lists.provincia.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {item}
-                </MenuItem>
-              ))}
-            </Select>
-            </FormControl>
-          <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
-          <InputLabel>Territorio</InputLabel>
-            <Select
-              label="territorio"
-              name="territorio"
-              value={contactData.territorio}
-              onChange={handleTerritorioChange}
-            >
-              {lists && lists.territorio && lists.territorio.map((item, index) => (
-                <MenuItem key={index} value={item}>
-                  {item}
-                </MenuItem>
-              ))}
-            </Select>
-            </FormControl>
+          <DialogContentText sx={{mt:1}}>Introduzca los nuevos datos de contacto:</DialogContentText>
+          <TextField
+          sx={{ margin: 1 }}
+          label="nombre"
+          name="nombre"
+          fullWidth
+          value={nombre}
+          onChange={handleNombreChange}
+          />
+            <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
+            <InputLabel>Cargo</InputLabel>
+              <Select
+                label="cargo"
+                name="cargo"
+                value={contactData.cargo}
+                onChange={handleCargoChange}
+              >
+                {lists && lists.cargo && lists.cargo.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              </FormControl>
+            <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
+            <InputLabel>Entidad</InputLabel>
+              <Select
+                label="entidad"
+                name="entidad"
+                value={contactData.entidad}
+                onChange={handleEntidadChange}
+              >
+                {lists && lists.entidad && lists.entidad.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              </FormControl>
+            <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
+            <InputLabel>Categoria</InputLabel>
+              <Select
+                label="categoria"
+                name="categoria"
+                value={contactData.categoria}
+                onChange={handleCatChange}
+              >
+                {lists && lists.categoria && lists.categoria.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              </FormControl>
+            <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
+            <InputLabel>Provincia</InputLabel>
+              <Select
+                label="provincia"
+                name="provincia"
+                value={contactData.provincia}
+                onChange={handleProvinciaChange}
+              >
+                {lists && lists.provincia && lists.provincia.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              </FormControl>
+            <FormControl variant="outlined" sx={{ m: 1, width: '100%' }}>
+            <InputLabel>Territorio</InputLabel>
+              <Select
+                label="territorio"
+                name="territorio"
+                value={contactData.territorio}
+                onChange={handleTerritorioChange}
+              >
+                {lists && lists.territorio && lists.territorio.map((item, index) => (
+                  <MenuItem key={index} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              </FormControl>
 
-        <TextField
-          sx={{ margin: 1 }}
-          label="Email" 
-          fullWidth
-          type="email"
-          value={email}
-          onChange={handleEmailChange}
-        />
-        <TextField
-          sx={{ margin: 1 }}
-          label="telefono" 
-          fullWidth
-          type="telefono"
-          value={telefono}
-          onChange={handleTelChange}
-        />
+          <TextField
+            sx={{ margin: 1, width: '100%' }}
+            label="Email" 
+            fullWidth
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+          />
+          <TextField
+            sx={{ margin: 1, width: '100%' }}
+            label="telefono" 
+            fullWidth
+            type="telefono"
+            value={telefono}
+            onChange={handleTelChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={editClose} variant='outlined' color="success">
+            Cancelar
+          </Button>
+          <Button onClick={() => onSubmit(contactData)}  variant='outlined' color="primary">
+            Guardar
+          </Button>
+        </DialogActions>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={editClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={() => onSubmit(contactData)} color="primary">
-          Save
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

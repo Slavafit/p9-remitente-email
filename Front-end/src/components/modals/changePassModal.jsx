@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  DialogTitle } from "@mui/material";
+import { DialogTitle } from "@mui/material";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -7,11 +7,16 @@ import Dialog from "@mui/material/Dialog";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+
 const ChangePasswordModal = ({ resetOpen, handleClose, onSubmit }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleOldPassChange = (event) => {
     setOldPassword(event.target.value);
@@ -36,6 +41,10 @@ const ChangePasswordModal = ({ resetOpen, handleClose, onSubmit }) => {
     }
     setConfirmPass(confirmPassword);
   };
+  //обработчик отображения пароля
+  const handlePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = () => {
     if (newPassword === confirmPass) {
@@ -47,62 +56,75 @@ const ChangePasswordModal = ({ resetOpen, handleClose, onSubmit }) => {
 
   return (
     <Dialog open={resetOpen} onClose={handleClose}>
-
-      <DialogContent sx={{padding: 3, backgroundColor: 'grey.300'}}>
-      <DialogTitle>Editar contraseña</DialogTitle>
+      <DialogContent sx={{ padding: 3, backgroundColor: "grey.300" }}>
+        <DialogTitle>Editar contraseña</DialogTitle>
         <Box
-            sx={{
-              padding: 3,
-              borderRadius: 5,
-              gap:2,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              bgcolor: "Menu",
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'
-            }}
-          >
-        <DialogContentText>Ingrese la nueva contraseña:</DialogContentText>
-        <TextField
-          sx={{ margin: 1 }}
-          label="Contraseña anterior" 
-          fullWidth
-          value={oldPassword}
-          onChange={handleOldPassChange}
-        />
-        <TextField
-          sx={{ margin: 1 }}
-          label="Nueva contraseña" 
-          fullWidth
-          value={newPassword}
-          onChange={handleNewPassChange}
-          error={error.length > 0}
-          helperText={error}
-        />
-        <TextField
-          sx={{ margin: 1 }}
-          label="Confirmar contraseña" 
-          fullWidth
-          value={confirmPass}
-          onChange={handleConfirmPassChange}
-          error={error.length > 0}
-          helperText={error}
-        />
-      </Box>
-        <DialogActions sx={{ my:2}}>
-          <Button onClick={() => {
-            handleClose();
-            setOldPassword("");
-            setNewPassword("");
-            setConfirmPass("");
-            setError("");
+          sx={{
+            padding: 3,
+            borderRadius: 5,
+            gap: 2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            bgcolor: "Menu",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.5)",
           }}
-          variant="outlined" 
-          color="success" 
+        >
+          <DialogContentText>Ingrese la nueva contraseña:</DialogContentText>
+          <TextField
+            sx={{ margin: 1 }}
+            label="Contraseña anterior"
+            fullWidth
+            value={oldPassword}
+            onChange={handleOldPassChange}
+          />
+          <TextField
+            sx={{ margin: 1 }}
+            label="Nueva contraseña"
+            fullWidth
+            type={showPassword ? "text" : "password"}
+            value={newPassword}
+            onChange={handleNewPassChange}
+            error={error.length > 0}
+            helperText={error}
+            InputProps={{
+              endAdornment: (
+                <IconButton
+                  onClick={handlePasswordVisibility}
+                  edge="end"
+                  title="monstrar la conrtaseña"
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              ),
+            }}
+          />
+          <TextField
+            sx={{ margin: 1 }}
+            label="Confirmar contraseña"
+            fullWidth
+            type={showPassword ? "text" : "password"}
+            value={confirmPass}
+            onChange={handleConfirmPassChange}
+            error={error.length > 0}
+            helperText={error}
+          />
+        </Box>
+        <DialogActions sx={{ my: 2 }}>
+          <Button
+            onClick={() => {
+              handleClose();
+              setOldPassword("");
+              setNewPassword("");
+              setConfirmPass("");
+              setError("");
+            }}
+            variant="outlined"
+            color="success"
           >
             Cancelar
           </Button>
-          <Button variant="outlined" color="success" onClick={handleSubmit}>
+          <Button variant="outlined" color="primary" onClick={handleSubmit}>
             Guardar
           </Button>
         </DialogActions>
