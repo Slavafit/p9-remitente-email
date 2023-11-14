@@ -63,8 +63,8 @@ const AddContactModal = ({ open, onSubmit, close, lists }) => {
 
   return (
     <Dialog open={open} onClose={close}>
-      <DialogContent sx={{padding: 3, bgcolor: "Menu", }}>
-        <DialogTitle>Add new contact</DialogTitle>
+      <DialogContent sx={{padding: 3, bgcolor: 'grey.300', }}>
+        <DialogTitle>Añadir nuevo contacto</DialogTitle>
           <DialogContent
             sx={{
               borderRadius: 3,
@@ -72,13 +72,12 @@ const AddContactModal = ({ open, onSubmit, close, lists }) => {
               flexDirection: 'column',
               alignItems: 'left',
               gap: '20px',
-              // bgcolor: "Menu",
-              backgroundColor: 'grey.300',
+              bgcolor: "Menu",
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
               m: 2,
               }}
             >
-            <DialogContentText sx={{mt:1}}>Fill in the fields for the new contact:</DialogContentText>
+            <DialogContentText sx={{mt:1}}>Complete los campos para el nuevo contacto:</DialogContentText>
             <TextField
               required
               label="Nombre"
@@ -181,10 +180,10 @@ const AddContactModal = ({ open, onSubmit, close, lists }) => {
           </DialogContent>
         <DialogActions sx={{mt:1}}>
           <Button onClick={close} variant="outlined" color="success">
-            Cancel
+            Cancelar
           </Button>
-          <Button onClick={handleAddClick} variant="outlined" color="success">
-            Add
+          <Button onClick={handleAddClick} variant="outlined" color="primary">
+            Añadir
           </Button>
         </DialogActions>
       </DialogContent>

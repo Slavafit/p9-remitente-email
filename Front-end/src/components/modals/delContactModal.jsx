@@ -4,18 +4,18 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 const DelContactModal = ({ deleteOpen, handleClose, onDelete }) => {
   return (
     <Dialog open={deleteOpen} onClose={handleClose}>
-      <DialogTitle>Delete contact</DialogTitle>
+      <DialogTitle>Borrar contacto</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this contact? <br />This action cannot be undone.
+          ¿Estás seguro de que deseas eliminar este contacto? <br />Esta acción no se puede deshacer.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
+        <Button onClick={handleClose} variant='outlined' color="success">
+          Cancelar
         </Button>
-        <Button onClick={onDelete} color="primary">
-          Delete
+        <Button onClick={onDelete}variant='outlined' color="primary">
+          Borrar
         </Button>
       </DialogActions>
     </Dialog>

@@ -34,7 +34,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     try {
       addTokenToHeaders();
       const response = await axios.get(
-        `http://localhost:5000/personal/?username=${username}`
+        `https://p9-remitente.oa.r.appspot.com/personal/?username=${username}`
       );
       setUsers(response.data.user);
     } catch (error) {
@@ -48,7 +48,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
       try {
         const id = users._id
         addTokenToHeaders();
-        await axios.delete(`http://localhost:5000/users/?_id=${id}`);
+        await axios.delete(`https://p9-remitente.oa.r.appspot.com/users/?_id=${id}`);
         setDeleteOpen(false);
       } catch (error) {
         console.error("Error delete user:", error);
@@ -70,7 +70,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         };
         addTokenToHeaders();
         const response = await axios.put(
-          `http://localhost:5000/users/?_id=${id}`, userData );
+          `https://p9-remitente.oa.r.appspot.com/users/?_id=${id}`, userData );
         setUsers(response.data);
         let username = response.data.username;
         localStorage.setItem('username', username);
@@ -106,7 +106,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         // console.log(id,userData);
         addTokenToHeaders();
         const response = await axios.post(
-          `http://localhost:5000/changepassword/${id}`, userData 
+          `https://p9-remitente.oa.r.appspot.com/changepassword/${id}`, userData 
           );
         setResetOpen(false)
         showSnack('success', `Password updated successfully` );

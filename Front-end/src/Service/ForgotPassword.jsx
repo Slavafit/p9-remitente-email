@@ -65,7 +65,7 @@ export default function ForgotPassword( { open, close } ) {
     if (!hasErrors) {
       try {
         const response = await axios.post(
-          "http://localhost:5000/resetpassword/forgot", formData);
+          "https://p9-remitente.oa.r.appspot.com/resetpassword/forgot", formData);
         let responseMessage = response.data.message;
         console.log(responseMessage);
         close();

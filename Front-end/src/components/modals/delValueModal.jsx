@@ -4,18 +4,18 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 const DeleteValueModal = ({ deleteOpen, deleteClose, onDelete }) => {
   return (
     <Dialog open={deleteOpen} onClose={deleteClose}>
-      <DialogTitle>Delete value</DialogTitle>
+      <DialogTitle>Borrar valor</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this value? <br />This action cannot be undone.
+        ¿Estás seguro de que deseas eliminar este valor? <br />Esta acción no se puede realizar.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={deleteClose} color="primary">
-          Cancel
+        <Button onClick={deleteClose} variant="outlined" color="success">
+          Cancelar
         </Button>
-        <Button onClick={onDelete} color="primary">
-          Delete
+        <Button onClick={onDelete}  variant="outlined" color="primary">
+          Borrar
         </Button>
       </DialogActions>
     </Dialog>

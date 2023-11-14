@@ -57,7 +57,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
     try {
       setLoading(true);
       addTokenToHeaders();
-      const response = await axios.get(`http://localhost:5000/maillists`);
+      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/maillists`);
       let fetchedData = response.data;
       setMailList(fetchedData);
       setLoading(false);

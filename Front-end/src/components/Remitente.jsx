@@ -15,7 +15,7 @@ const StyledFab = styled(Fab)({
   position: 'absolute',
   zIndex: 1,
   top: 9,
-  left: "20%",
+  left: "60%",
   right: 0,
   margin: '0 auto',
   display: 'flex',
@@ -26,7 +26,7 @@ const StyleFab = styled(Fab)({
   position: 'absolute',
   zIndex: 1,
   top: 9,
-  left: "40%",
+  left: "75%",
   right: 0,
   margin: '0 auto',
   display: 'flex',
@@ -163,7 +163,7 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
         };
 
         addTokenToHeaders();
-        const response = await axios.post(`http://localhost:5000/maillists`, mailData);
+        const response = await axios.post(`https://p9-remitente.oa.r.appspot.com/maillists`, mailData);
         let responseData = response.data.message;
         // console.log(responseData);
         showSnack('success', responseData);
@@ -193,7 +193,7 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
         };
         console.log(mailData);
         addTokenToHeaders();
-        const response = await axios.patch(`http://localhost:5000/maillists`, mailData);
+        const response = await axios.patch(`https://p9-remitente.oa.r.appspot.com/maillists`, mailData);
         let responseData = response.data.message;
         showSnack(responseData);
       } catch (error) {
@@ -212,7 +212,12 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
 
 
   return (
-    <Paper elevation={3} sx={{ height: 'auto', width: '100%', backgroundColor: 'grey.300' }}>
+    <Paper elevation={3} sx={{ 
+      height: 'auto', 
+      width: '100%', 
+      backgroundColor: 'grey.300', 
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)'
+      }}>
       <FormControl sx={{ m: 1,  minWidth: 300 }}>
         <InputLabel id="event-name">Eventos nuevos</InputLabel>
         <Select

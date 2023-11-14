@@ -56,9 +56,9 @@ router.get('/personal', authMiddleware, controller.getUserByUsername)
 router.get('/events', authMiddleware, controller.getEvents)
 router.get('/lists', authMiddleware, controller.getLists)
 router.get('/contacts', authMiddleware, controller.getContacts)
-router.get('/maillists', authMiddleware, controller.getMailList)
+router.get('/maillists', authMiddleware, controller.getMailList) 
 router.get('/dashboard', roleMiddleware(['ADMIN']), controller.getUsers)
-router.get('/response', controller.responseMailList)
+router.get('/response/:eventId/:contactId/:response', controller.responseMailList)
 
 router.put('/users', [
      check('username', "Nombre de usuario no puede estar vacía.").notEmpty(),
@@ -76,12 +76,13 @@ router.put('/contacts',[
 router.put('/lists', authMiddleware, controller.updateList)
 
 router.patch('/lists', [
-     check('cargo', "no hay valores").notEmpty(),
-     check('provincia', "no hay valores").notEmpty(),
-     check('entidad', "no hay valores").notEmpty(),
-     check('categoria', "no hay valores").notEmpty(),
-     check('territorio', "no hay valores").notEmpty(),
-     ], authMiddleware, controller.patchList)
+     check('cargo', "no hay valores").optional().isArray({ min: 1 }),
+     check('provincia', "no hay valores").optional().isArray({ min: 1 }),
+     check('entidad', "no hay valores").optional().isArray({ min: 1 }),
+     check('categoria', "no hay valores").optional().isArray({ min: 1 }),
+     check('territorio', "no hay valores").optional().isArray({ min: 1 }),
+   ], authMiddleware, controller.patchList)
+   
 router.patch('/maillists', [
      check('contacts', "Seleccione uno o más contactos").isArray({ min: 1 }),
      check('eventId', "Seleccione uno o más contactos").notEmpty(),
