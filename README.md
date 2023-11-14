@@ -39,8 +39,7 @@ backend:
 
 ## Screenshots 📷
 
-<img src="Images/Captura de pantalla 2023-11-14 100425.png" width="350" height="200"><img src="Images/Captura de pantalla 2023-11-14 100456.png" width="350" height="200">
-
+<img src="images/Captura de pantalla 2023-11-14 100425.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 100456.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 104800.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 104827.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 104852.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 104918.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 104934.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 105034.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 104954.png" width="350" height="200"><img src="images/Captura de pantalla 2023-11-14 105051.png" width="350" height="200"><img src="images/Diagramma fijo.jpg" width="350" height="200"><img src="images/Diagramma DB.png" width="350" height="200">
 ## Stacks 🖥️
 ● Microsoft Visual Studio 2022 <br>
 ● JavaScrypt <br>
@@ -68,7 +67,7 @@ backend:
 
 ## Installation Process ⬆️
 
-1. Clone the GitHub repository: https://github.com/Slavafit/P8-react-player.git
+1. Clone the GitHub repository: [https://github.com/Slavafit/P8-react-player.git](https://github.com/Slavafit/p9-remitente-email.git)
 2. Open the file using Microsoft Visual Studio 2022.
 3. en consola acceder a la carpeta del proyecto, npm install
 4. en la carpeta Back-end npm start
