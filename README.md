@@ -31,16 +31,17 @@ el correo electrónico y la función del usuario. También puede eliminar un usu
 
 
 **backend:**
+
 **Descripción del Backend:**
-Basado en express framework para Node.js
-MongoDB alojado en la nube se utiliza como base de datos.
-El procesamiento intermedio de imágenes es utilizado por multer.
-Cloudinary se utiliza para almacenar imágenes.
-Para realizar las comprobaciones se utiliza el framework express-validator.
-Para la distribución de correo se utiliza nodemailer.
-Para el cifrado de contraseñas se utiliza bcrypt.
-Para desencriptar tokens se utiliza jsonwebtoken.
-Para generar enlaces únicos, se utiliza uuidv4.
+* Basado en express framework para Node.js
+* MongoDB alojado en la nube se utiliza como base de datos.
+* El procesamiento intermedio de imágenes es utilizado por multer.
+* Cloudinary se utiliza para almacenar imágenes.
+* Para realizar las comprobaciones se utiliza el framework express-validator.
+* Para la distribución de correo se utiliza nodemailer.
+* Para el cifrado de contraseñas se utiliza bcrypt.
+* Para desencriptar tokens se utiliza jsonwebtoken.
+* Para generar enlaces únicos, se utiliza uuidv4.
 
 
 **Se implementan las siguientes funciones:**
