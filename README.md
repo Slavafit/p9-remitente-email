@@ -97,7 +97,7 @@ El servidor gestiona los errores emitiendo mensajes y los devuelve al cliente.
 <img src="images/Captura de pantalla 2023-11-14 134705.png" width="350" height="200">
 <img src="images/Diagramma fijo.jpg" width="350" height="400"><img src="images/Diagramma DB.png" width="350" height="200">
 ## Stacks 🖥️
-● Microsoft Visual Studio 2022 <br>
+● Microsoft Visual Studio code <br>
 ● JavaScrypt <br>
 ● Node.js <br>
 ● Express.js <br>
