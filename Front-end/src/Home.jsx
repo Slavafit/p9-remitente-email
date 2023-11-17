@@ -120,12 +120,12 @@ function Home() {
           </AccordionSummary>
           <AccordionDetails>
               <MailManager
-              events={events}
-              contacts={contacts}
-              search={search}
-              setLoading={setLoading}
-              refreshFlag={refreshFlag}
-              updateMailLists={updateMailLists}
+                events={events}
+                contacts={contacts}
+                search={search}
+                setLoading={setLoading}
+                refreshFlag={refreshFlag}
+                updateMailLists={updateMailLists}
              />
           </AccordionDetails>
         </Accordion>

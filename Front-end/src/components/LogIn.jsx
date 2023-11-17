@@ -140,7 +140,7 @@ export default function LogIn() {
           email,
           password,
         });
-        console.log("response",response);
+        // console.log("response",response);
         // Получить JWT-токен и прочее из ответа сервера
         const token = response.data.token;
         const userId = response.data.userData.userId;

@@ -110,8 +110,6 @@ export default function SignUp( {showSnack, open, close} ) {
         }
       }
     }
-  
-    form.reset();
   };
   
 
@@ -244,6 +242,7 @@ export default function SignUp( {showSnack, open, close} ) {
             type="submit" 
             variant="outlined"
             endIcon={<SendIcon />}
+            onClick={handleSubmit}
           >
             Enviar
           </Button>

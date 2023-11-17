@@ -88,10 +88,11 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
       addTokenToHeaders();
       const updatedList = {
         _id: lists._id,
-        [listName]: [...lists[listName], newItems[listName]] // Добавить новый элемент к массиву
+        [listName]: [newItems[listName]] // Добавить новый элемент к массиву
       };
       // console.log("post-patch",updatedList)
       const response = await axios.patch(`https://p9-remitente.oa.r.appspot.com/lists/`,updatedList);
+      // const response = await axios.patch(`http://localhost:5000/lists/`,updatedList);
       console.log(response.data);
       let responseData = response.data.message;
       showSnack('success', responseData);
@@ -163,7 +164,7 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
         const response = await axios.put(`https://p9-remitente.oa.r.appspot.com/lists/`, updatedData);
         if (response.status === 200) {
           setDelOpen(false);
-          showSnack(`Value "${valueToDelete}" from "${listName}" was deleted`);
+          showSnack(`Valor "${valueToDelete}" desde "${listName}" fué borrado`);
           setTimeout(() => {
             fetchLists();
           }, 1000);

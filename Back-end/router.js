@@ -5,6 +5,16 @@ const {check} = require('express-validator')
 const authMiddleware = require('./middleware/authMiddleware')
 const roleMiddleware = require('./middleware/roleMiddleware')
 
+
+const validateArray = (value) => {
+     // Проверка наличия значений и отсутствия пустых строк в массиве
+     if (!value || !Array.isArray(value) || value.length === 0 || value.some(item => typeof item !== 'string' || item.trim() === '')) {
+       throw new Error('No hay valores');
+     }
+   
+     return true;
+   };
+
 router.post('/registration', [
      check('username', "Nombre de usuario no puede estar vacía.").notEmpty(),
      check('email', "Email no puede estar vacía.").notEmpty(),
@@ -14,8 +24,8 @@ router.post('/registration', [
      ], roleMiddleware(['ADMIN']), controller.registration)
 router.post('/login', controller.login)
 router.post('/changepassword/:id', [
-     check('oldPassword', "La contraseña anterior está vacía").notEmpty(),
-     check('newPassword', "La nueva contraseña no puede estar vacía").notEmpty(),
+     check('oldPassword', "La contraseña anterior está vacía.").notEmpty(),
+     check('newPassword', "La nueva contraseña no puede estar vacía.").notEmpty(),
      check ('newPassword', "La contraseña debe tener más de 6 y menos de 20 caracteres.")
      .isLength({min:6, max:20}, )
      ], controller.changePassword)
@@ -64,7 +74,7 @@ router.put('/users', [
      check('username', "Nombre de usuario no puede estar vacía.").notEmpty(),
      check('email', "Email no puede estar vacío.").notEmpty(),
      check('email', "No es la dirección de correo electrónico.").isEmail(),
-     ], roleMiddleware(['ADMIN','USER']), controller.updateUser)
+     ], authMiddleware, controller.updateUser)
 router.put('/events', [
      check('name', "El nombre del evento no puede estar vacío").notEmpty(),
      ], authMiddleware, controller.updateEvent)
@@ -76,11 +86,11 @@ router.put('/contacts',[
 router.put('/lists', authMiddleware, controller.updateList)
 
 router.patch('/lists', [
-     check('cargo', "no hay valores").optional().isArray({ min: 1 }),
-     check('provincia', "no hay valores").optional().isArray({ min: 1 }),
-     check('entidad', "no hay valores").optional().isArray({ min: 1 }),
-     check('categoria', "no hay valores").optional().isArray({ min: 1 }),
-     check('territorio', "no hay valores").optional().isArray({ min: 1 }),
+     check('cargo', "no hay valores").optional().custom(validateArray),
+     check('provincia', "no hay valores").optional().custom(validateArray),
+     check('entidad', "no hay valores").optional().custom(validateArray),
+     check('categoria', "no hay valores").optional().custom(validateArray),
+     check('territorio', "no hay valores").optional().custom(validateArray),
    ], authMiddleware, controller.patchList)
    
 router.patch('/maillists', [

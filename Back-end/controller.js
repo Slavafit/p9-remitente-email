@@ -532,25 +532,7 @@ class controller {
             res.status(500).json({ error: 'createMailList error', message: error.message });
         }
     };
-    // Обработчик обновления записи MailList
-    async updateMailList(req, res) {
-        try {
-            const { _id } = req.query;
-            const { entries } = req.body;
-        
-            // Обновляем данные записи по _id
-            const updatedMailList = await MailListModel.findByIdAndUpdate(_id, { entries }, { new: true });
-        
-            if (!updatedMailList) {
-                return res.status(404).json({ message: 'MailList no encontrado' });
-            }
-        
-            res.json(updatedMailList);
-        } catch (e) {
-            console.error(e);
-            res.status(500).json({ message: 'Server error' });
-        }
-    };
+
     // Обработчик получения mailList
     async getMailList(req, res) {
         try {
@@ -579,7 +561,7 @@ class controller {
           
                 await mailList.save();
                 // return res.json({ message: 'Respuesta actualizada correctamente' });
-                const filePath = path.join(__dirname, 'views', 'welcome.html');
+                const filePath = path.join(__dirname, 'views', 'wellcome.html');
                 return res.sendFile(filePath);
 
               } else {
@@ -902,7 +884,7 @@ class controller {
     // Обработчик удаления list
     async deleteListValues(req, res) {
         const { _id, provincia, entidad, categoria, territorio } = req.body;
-        console.log("Received deleteListValues request", _id);
+        // console.log("Received deleteListValues request", _id);
         try {
           const updateQuery = {};
       
