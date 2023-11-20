@@ -59,7 +59,6 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
       addTokenToHeaders();
       const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/lists`);
       let fetchedLists = response.data[0]; // Получаем первый объект из массива
-      // console.log("get",fetchedLists);
       setLists(fetchedLists);
       updateLists(fetchedLists)
       setLoading(false);
@@ -75,7 +74,6 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
 
     //добавление новых значений в массивы
   const handleNewChange = (listName) => (event) => {
-    // console.log("handleNewChange",listName);
     setNewItems({
       ...newItems,
       [listName]: event.target.value
@@ -90,9 +88,7 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
         _id: lists._id,
         [listName]: [newItems[listName]] // Добавить новый элемент к массиву
       };
-      // console.log("post-patch",updatedList)
       const response = await axios.patch(`https://p9-remitente.oa.r.appspot.com/lists/`,updatedList);
-      // const response = await axios.patch(`http://localhost:5000/lists/`,updatedList);
       console.log(response.data);
       let responseData = response.data.message;
       showSnack('success', responseData);
@@ -241,7 +237,6 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
           <IconButton title="Añadir artículo">
             <ControlPointIcon onClick={handleAddItem(editItem.listName)}/>
           </IconButton>
-        {/* <Button title="Add item" onClick={handleAddItem(editItem.listName)}>Add Item</Button> */}
         </FormControl>
         {/* редактирование */}
         <FormControl sx={{ m: 1, width: 200 }}>
@@ -254,15 +249,10 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
             <EditRoundedIcon onClick={handleEditItem}/>
           </IconButton>
         </FormControl>
-
           <IconButton sx={{ m: 1, ml: 6 }} size="large"
             title="Delete elemento de valor" onClick={()=>{setDelOpen(true)}}>
             <DeleteIcon />
           </IconButton>
-
-
-          {/* <Button variant="outlined" onClick={handleDeleteItem}>Delete Item</Button> */}
-
       </Paper>
       </Box>
         <DeleteValueModal

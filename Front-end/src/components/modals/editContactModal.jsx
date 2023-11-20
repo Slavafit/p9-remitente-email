@@ -71,7 +71,6 @@ const EditContactModal = ({
       email: email,
       telefono: telefono
     };
-    // console.log(contactData);
 
   return (
     <Dialog open={editOpen} onClose={editClose}>

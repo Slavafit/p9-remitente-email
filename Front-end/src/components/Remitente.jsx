@@ -44,13 +44,11 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
   const [selmailLists, setMailLists] = useState('');
   const [selectedEventId, setSelectedEventId] = useState('');
 
-  // console.log(events);
   
   //обработчик выбора нового события
   const handleChange = (event) => {
     setSelectedEvent(event.target.value);
     const selectedEventName = event.target.value;
-    // console.log(event);
 
       // Находим событие в массиве events по его имени
     const selectedEvent = events.find(event => event.name === selectedEventName);
@@ -65,13 +63,11 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
     const handleEventUsedChange = (event) => {
       setMailLists(event.target.value);
       const selectedEventId = event.target.value;
-      // console.log(selectedEventId);
 
             // Находим событие в массиве events по его имени
     const findExisteEvent = events.find(event => event._id === selectedEventId);
     if (findExisteEvent) {
       setExisteEvent(findExisteEvent.name);
-      // console.log(existeEvent);
     }
     };
 
@@ -90,38 +86,11 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
     }
   };
 
-
-
-  //обработчик выбора nombre
-  const handleDropdownChange = (event) => {
-    const selectedValue = event.target.value;
-    if (selectedValue !== '') {
-      const newFilteredContacts = contacts.filter((contact) => contact.nombre === selectedValue);
-      setFilteredContacts(newFilteredContacts);
-    } else {
-      setFilteredContacts(contacts);
-    }
-  };
   
   const uniqueNames = [...new Set(contacts.map((contact) => contact.nombre))];
   
   const columns = [
-    // {
-    //   field: 'nombre',
-    //   headerName: 'Nombre',
-    //   width: 150,
-    //   sortable: false,
-    //   renderHeader: (params) => (
-    //     <select onChange={handleDropdownChange}>
-    //       <option value="">Todos</option>
-    //       {uniqueNames.map((name, index) => (
-    //         <option key={index} value={name}>
-    //           {name}
-    //         </option>
-    //       ))}
-    //     </select>
-    //   ),
-    // },
+
     { field: 'nombre', headerName: 'Nombre', width: 170 },
     { field: 'cargo', headerName: 'Cargo', width: 150 },
     { field: 'categoria', headerName: 'Categoria', width: 150 },
@@ -165,12 +134,10 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
         addTokenToHeaders();
         const response = await axios.post(`https://p9-remitente.oa.r.appspot.com/maillists`, mailData);
         let responseData = response.data.message;
-        // console.log(responseData);
         showSnack('success', responseData);
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          // showSnack(resError);
           showSnack('warning', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
           const resError = error.response.data.errors[0].message;
@@ -268,7 +235,6 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
           </StyleFab>
         </Stack>
       <DataGrid
-        // rows={filteredContacts}
         rows={contacts}
         columns={columns}
         getRowId={(contacts) => contacts._id}

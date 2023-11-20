@@ -376,7 +376,14 @@ class controller {
                 const contactInfo = await ContactModel.findById(contact);
                 const eventInfo = await EventModel.findById(eventId);
                 const startDate = new Date(eventInfo.startDate);
-                const formattedDate = startDate.toLocaleString();
+                const options = {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  };
+                const formattedDate = startDate.toLocaleString('DE', options);
 
                 if (contactInfo) {
                     const link = `${process.env.APP_URL}/response/${eventId}/${contact}`;
@@ -471,7 +478,14 @@ class controller {
                 const contactInfo = await ContactModel.findById(contact);
                 const eventInfo = await EventModel.findById(eventId);
                 const startDate = new Date(eventInfo.startDate);
-                const formattedDate = startDate.toLocaleString();
+                const options = {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  };
+                const formattedDate = startDate.toLocaleString('DE', options);
 
                 if (contactInfo) {
                     const mailMessage = {

@@ -36,21 +36,6 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
     <>
         <AppBar position='static'>
             <Toolbar>
-                {/* {auth && (
-                    <div>
-                <IconButton
-                size="medium"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                title='menu'
-                sx={{ mr: 2 }}
-                onClick={showMenu}
-            >
-                <MenuIcon />
-            </IconButton>
-            </div>
-                )} */}
                 <Typography
                     variant='h6'
                     component='a'

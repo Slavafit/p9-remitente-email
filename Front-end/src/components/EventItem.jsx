@@ -105,7 +105,7 @@ TablePaginationActions.propTypes = {
 
 
 const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag }) => {
-  // console.log(search);
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [events, setEvents] = React.useState([]);
@@ -163,7 +163,6 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       addTokenToHeaders();
       const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/events`);
       let fetchedEvents = response.data;
-      // console.log("EventItem:", fetchedEvents)
       setEvents(fetchedEvents);
       updateEvents(fetchedEvents);
       setLoading(false);
@@ -182,13 +181,6 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     try {
       setLoading(true);
       addTokenToHeaders();
-      // console.log(eventData);
-      // const formData = new FormData();
-      // formData.append('name', eventData.name);
-      // formData.append('description', eventData.description);
-      // formData.append('image', eventData.image);
-      // formData.append('startDate', eventData.startDate);
-      // formData.append('endDate', eventData.endDate);
       const response = await axios.post(
         "https://p9-remitente.oa.r.appspot.com/events/", eventData, {
           headers: {
@@ -200,7 +192,6 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       setTimeout(() => {
         fetchEvents();
       }, 2000);
-      // console.log("Event created:", response.data.message);
       setLoading(false);
     } catch (error) {
       if ( error.response.data && error.response.data.message) {
@@ -276,8 +267,6 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         console.error("Error delete event:", error);
       }
     };
-
-
 
 
 

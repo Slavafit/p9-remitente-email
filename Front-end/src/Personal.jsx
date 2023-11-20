@@ -25,7 +25,6 @@ const ProfilePage = ( {showSnack, open, close} ) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // console.log("personal: ", username);
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -103,7 +102,6 @@ const ProfilePage = ( {showSnack, open, close} ) => {
           oldPassword: oldPassword,
           newPassword: newPassword,
         };
-        // console.log(id,userData);
         addTokenToHeaders();
         const response = await axios.post(
           `https://p9-remitente.oa.r.appspot.com/changepassword/${id}`, userData 
@@ -113,7 +111,6 @@ const ProfilePage = ( {showSnack, open, close} ) => {
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          // showSnack(resError);
           showSnack('warning', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
           const resError = error.response.data.errors[0].message;

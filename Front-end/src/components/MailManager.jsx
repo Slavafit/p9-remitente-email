@@ -81,8 +81,6 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
 
     useEffect(() => {
       const selectedMail = mailLists.find((mail) => mail.event === selectedEventId);
-      // console.log("selectedMail",selectedMail);
-      // console.log("filteredContacts",filteredContacts);
       if (selectedMail) {
         //ищу все контакты по id из entries
         const contactsFromMail = selectedMail.entries.map((entry) => findContactById(entry.contact));

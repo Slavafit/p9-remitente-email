@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Container } from "@mui/material"
 import Header from "./components/Header"
-import LeftMenu from "./components/LeftMenu"
 import Search from './components/Search'
 import EventTable from './components/EventItem';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -21,7 +20,6 @@ import UsersTable from './UsersTable'
 
 
 function Home() {
-  const [isMenuOpen, setMenuOpen] = useState()
   const [search, setSearch] = useState('')
   const [snackOpen, setSnackOpen] = useState(false)
   const [snackMessage, setSnackMessage] = useState('');
@@ -42,24 +40,19 @@ function Home() {
   const handleShowSnack = (title, message) => {
     setSnackMessage(message);
     setSnackTitle(title);
-    // console.log("title:",snackTitle, "snackMessage",snackMessage);
     setSnackOpen(true);
   };
 
   const updateEvents = (updatedEvents) => {
-    // console.log("Home", updatedEvents)
     setEvents(updatedEvents);
   };
   const updateLists = (updatedLists) => {
-    // console.log("Home", updatedLists)
     setLists(updatedLists);
   };
   const updateContacts = (updatedContacts) => {
-    // console.log("Home", contacts)
     setContacts(updatedContacts);
   };
   const updateMailLists = (mailLists) => {
-    // console.log("Home", mailLists)
     setMailLists(mailLists);
   };
   const openPeronal = () => {
@@ -89,7 +82,6 @@ function Home() {
     <CssBaseline />
       <Container>
         <Header
-          showMenu={() => setMenuOpen(true)}
           refresh={handleRefresh}
           showPersonal={openPeronal}
           showSignUp={openSignUp}
@@ -186,20 +178,6 @@ function Home() {
           </AccordionDetails>
         </Accordion>
         </Container>
-        <LeftMenu
-          menuOpen={isMenuOpen}
-          menuClose={() => setMenuOpen(false)}
-          onEventTable={() => {
-            setDisplayItem('EventTable'); // При выборе EventTable скрываем MailItem
-            setDisplayMail(null);
-            setShowPersonal(false);
-          }}
-          onMailItem={() => {
-            setDisplayMail('MailItem'); // При выборе MailItem скрываем EventTable
-            setDisplayItem(null);
-            setShowPersonal(false);
-          }}
-        />
         {showPersonal && (
           <ProfilePage
             showSnack={(title, message)=>handleShowSnack(title, message)}
