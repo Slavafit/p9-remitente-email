@@ -386,7 +386,7 @@ class controller {
                 const formattedDate = startDate.toLocaleString('DE', options);
 
                 if (contactInfo) {
-                    const link = `${process.env.APP_URL}/response/${eventId}/${contact}`;
+                    const link = `${process.env.BACK_URL}/response/${eventId}/${contact}`;
                     const mailMessage = {
                         from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
                         to: contactInfo.email,
@@ -412,8 +412,8 @@ class controller {
                         <p>Un saludo</p>
 
                         <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
-                        <a href="${link}/Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
-                        <a href="${link}/No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+                        <a href="${link}/Asistencia" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Confirma asistencia.</a>
+                        <a href="${link}/NO asistencia" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Confirma NO asistencia</a>
                         </body>
                         </html>
                         `,
@@ -488,6 +488,7 @@ class controller {
                 const formattedDate = startDate.toLocaleString('DE', options);
 
                 if (contactInfo) {
+                    const link = `${process.env.BACK_URL}/response/${eventId}/${contact}`;
                     const mailMessage = {
                         from: 'Remitente de la invitación. Fondación Don Bosco <slavfit@gmail.com>',
                         to: contactInfo.email,
@@ -513,8 +514,8 @@ class controller {
                         <p>Un saludo</p>
 
                         <p>Esta carta requiere su respuesta. Por favor, seleccione su respuesta.<p>
-                        <a href="https://p9-remitente.oa.r.appspot.com/response/${eventId}/${contact}/Voy" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Si, voy.</a>
-                        <a href="https://p9-remitente.oa.r.appspot.com/response/${eventId}/${contact}/No puedo" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lo siento, no puedo.</a>
+                        <a href="${link}/Asistencia" style="display: inline-block; padding: 10px 20px; background-color: #337ab7; color: #fff; text-decoration: none; border-radius: 5px;">Confirma asistencia.</a>
+                        <a href="${link}/NO asistencia" style="display: inline-block; padding: 10px 20px; background-color: #d9534f; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 10px;">Confirma NO asistencia</a>
                         </body>
                         </html>
                         `,
@@ -522,7 +523,7 @@ class controller {
                     mailer(mailMessage)
                         .then(info => {
                             // Обработка успешной отправки
-                            // console.log('Email sent: ', info);
+                            console.log('Email sent: ', info);
                     
                             // Обновление флага isSent в MailList
                             return MailListModel.findOneAndUpdate(

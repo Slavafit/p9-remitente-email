@@ -105,7 +105,6 @@ const AddEventModal = ({ open, onSubmit, close }) => {
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               <DesktopDateTimePicker
                 label="Fecha y hora de inicio"
-                // value={eventData.startDate}
                 value={dayjs(startDate)}
                 onChange={(newDate) => handleDateTimeChange(newDate, 'startDate')}
                 renderInput={(params) => <TextField {...params} />}

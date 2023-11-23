@@ -257,7 +257,6 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         addTokenToHeaders();
         const response = await axios.delete(`
         https://p9-remitente.oa.r.appspot.com/events/${selectedEvent}`);
-        // let message = response.data.name;
         console.log(response.data);
         setDelOpen(false);
         fetchEvents();
@@ -342,7 +341,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
                     <span style={{ color: event.used ? 'red' : 'green' }}>
-                      {event.used ? 'Used' : 'New'}
+                      {event.used ? 'Abierto' : 'Nuevo'}
                     </span>
                   </TableCell>
                   <TableCell>

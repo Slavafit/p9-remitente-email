@@ -175,7 +175,10 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
       renderCell: (params) => (
         <div style={{ whiteSpace: "pre-wrap" }}>{params.value}</div>
       )},
-      { field: "povincia", headerName: "Provincia", width: 100 },
+      { field: "provincia", headerName: "Provincia", width: 100,
+      renderCell: (params) => (
+        <div style={{ whiteSpace: "pre-wrap" }}>{params.value}</div>
+      )},
       { field: "territorio", headerName: "Territorio", width: 120,
       renderCell: (params) => (
         <div style={{ whiteSpace: "pre-wrap" }}>{params.value}</div>
