@@ -124,9 +124,9 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
     
         if (contactEntry) {
           let color;
-          if (contactEntry.response === 'Voy') {
+          if (contactEntry.response === 'Confirma asistencia') {
             color = 'green';
-          } else if (contactEntry.response === 'No puedo') {
+          } else if (contactEntry.response === 'Confirma NO asistencia') {
             color = 'red';
           } else {
             color = 'gray';

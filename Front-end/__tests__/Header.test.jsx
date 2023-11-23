@@ -1,17 +1,13 @@
-import { render } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import Header from "../src/components/Header";
-import { useAuth } from "../src/service/AuthUser";
 
+const auth = true;
 
   describe('Header component', () => {
+
     it('the title is visible', () => {
-      const { getByText } = render(<Header />);
-      expect(getByText(/Remitente/i)).toBeInTheDocument();
+      render(<Header/>);
+
+      expect(screen.getAllByText(/Remitente/i)).toBeInTheDocument();
     });
   });
-  
-  
-  
-  
-  
-  

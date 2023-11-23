@@ -9,7 +9,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: '/setupTest.jsx',
     testTimeout: 60000,
-    include: ['**/*.{test,spec}.{jsx,mjs, ts}'],
-
+    include: ['**/*.{test,spec}.{jsx,mjs,ts}']
   }
 })

@@ -151,7 +151,6 @@ export default function LogIn() {
         sessionStorage.setItem('userId', userId);
         sessionStorage.setItem('username', username);
         sessionStorage.setItem('userRole', userRole);
-        sessionStorage.setItem('userRole', userRole);
         // Вернуть успех
         return true;
       }

@@ -35,7 +35,6 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* <Route path="/home" element={<Home />} /> */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
             <Route path="/" element={<LogIn />} />
             <Route exact path="/resetpassword/reset/:userId/:token" element={<ResetPasswordPage />} />

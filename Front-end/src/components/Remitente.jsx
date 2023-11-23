@@ -44,7 +44,7 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
   const [selmailLists, setMailLists] = useState('');
   const [selectedEventId, setSelectedEventId] = useState('');
 
-  // console.log(events);
+
   
   //обработчик выбора нового события
   const handleChange = (event) => {
@@ -106,22 +106,7 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
   const uniqueNames = [...new Set(contacts.map((contact) => contact.nombre))];
   
   const columns = [
-    // {
-    //   field: 'nombre',
-    //   headerName: 'Nombre',
-    //   width: 150,
-    //   sortable: false,
-    //   renderHeader: (params) => (
-    //     <select onChange={handleDropdownChange}>
-    //       <option value="">Todos</option>
-    //       {uniqueNames.map((name, index) => (
-    //         <option key={index} value={name}>
-    //           {name}
-    //         </option>
-    //       ))}
-    //     </select>
-    //   ),
-    // },
+
     { field: 'nombre', headerName: 'Nombre', width: 170 },
     { field: 'cargo', headerName: 'Cargo', width: 150 },
     { field: 'categoria', headerName: 'Categoria', width: 150 },

@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     setAuth(true);
-    sessionStorage.setItem("sessionStorage", "true");
+    sessionStorage.setItem("auth", "true");
     showSnack('success', 'Has iniciado sesión correctamente')
   };
 
@@ -34,7 +34,8 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('username');
-    sessionStorage.removeItem('sessionStorage');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('auth');
     setAuth(false);
     showSnack('success', 'Has terminado tu sesion')
   };
