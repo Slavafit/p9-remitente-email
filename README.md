@@ -131,7 +131,7 @@ El servidor gestiona los errores emitiendo mensajes y los devuelve al cliente.
 
 
 ## Next Steps 🔜
- 
+ Imposibilidad de enviar invitaciones para eventos que están cerrados. La fecha y la hora ya han pasado. Tampoco es posible aceptar respuestas una vez iniciado el evento.
 
 ## Author 👨‍💻
 
