@@ -1,9 +1,13 @@
 const Router = require('express')
 const router = new Router()
-const controller = require('./controller')
+const controller = require('../controllers/controller')
+const userController = require('../controllers/userController')
+const contactController = require('../controllers/contactController')
+const listService = require('../service/listService')
+const eventController = require('../controllers/eventController')
 const {check} = require('express-validator')
-const authMiddleware = require('./middleware/authMiddleware')
-const roleMiddleware = require('./middleware/roleMiddleware')
+const authMiddleware = require('../middlewares/authMiddleware')
+const roleMiddleware = require('../middlewares/roleMiddleware')
 
 router.post('/registration', [
      check('username', "Nombre de usuario no puede estar vacía.").notEmpty(),
@@ -11,69 +15,71 @@ router.post('/registration', [
      check('email', "No es la dirección de correo electrónico.").isEmail(),
      check ('password', "La contraseña debe tener más de 6 y menos de 20 caracteres.")
      .isLength({min:6, max:20}, )
-     ], roleMiddleware(['ADMIN']), controller.registration)
-router.post('/login', controller.login)
+     ], roleMiddleware(['ADMIN']), userController.registration)
+router.post('/login', userController.login)
+router.post('/logout', userController.logout)
 router.post('/changepassword/:id', [
      check('oldPassword', "La contraseña anterior está vacía").notEmpty(),
      check('newPassword', "La nueva contraseña no puede estar vacía").notEmpty(),
      check ('newPassword', "La contraseña debe tener más de 6 y menos de 20 caracteres.")
      .isLength({min:6, max:20}, )
-     ], controller.changePassword)
+     ], userController.changePassword)
 router.post('/resetpassword/forgot', [
      check('email', "Email no puede estar vacío").notEmpty(),
      check('email', "No es un correo electrónico.").isEmail(),
-     ], controller.forgotPassword)
+     ], userController.forgotPassword)
 router.post('/resetpassword/reset/:id/:token', [
      check('password', "La nueva contraseña no puede estar vacía").notEmpty(),
      check ('password', "La contraseña debe tener más de 6 y menos de 20 caracteres.")
      .isLength({min:6, max:20}, )
-     ], controller.resetPassword)
+     ], userController.resetPassword)
 router.post('/events', [
      check('name', "Nombre de evento no puede estar vacía.").notEmpty(),
-     ], authMiddleware, controller.createEvent)
+     ], authMiddleware, eventController.createEvent)
 router.post('/lists', [
      check('cargo', "No hay valores").notEmpty(),
      check('entidad', "No hay valores").notEmpty(),
      check('categoria', "No hay valores").notEmpty(),
      check('provincia', "No hay valores").notEmpty(),
      check('territorio', "No hay valores").notEmpty(),
-     ], authMiddleware, controller.createList)
+     ], authMiddleware, listService.createList)
 router.post('/contacts', [
      check('nombre', "Nombre no puede estar vacío").notEmpty(),
      check('nombre', 'Nombre no puede contener números').custom(value => {
           return !/\d/.test(value);}),
      check('email', "Email no puede estar vacío.").notEmpty(),
      check('email', "Compruebe la email").isEmail(),
-     ], authMiddleware, controller.createContact)
+     ], authMiddleware, contactController.createContact)
 router.post('/maillists', [
      check('eventId', "Seleccione un evento").notEmpty(),
      check('contacts', "Seleccione uno o más contactos").isArray({ min: 1 })
      ], authMiddleware, controller.createMailList)
 
 
-router.get('/users', roleMiddleware(['ADMIN']), controller.getUsers)
-router.get('/personal', authMiddleware, controller.getUserByUsername)
-router.get('/events', authMiddleware, controller.getEvents)
-router.get('/lists', authMiddleware, controller.getLists)
-router.get('/contacts', authMiddleware, controller.getContacts)
+router.get('/users', roleMiddleware(['ADMIN']), userController.getUsers)
+router.get('/activation/:activationLink', userController.aсtivateUser)
+router.get('/refresh', userController.refreshToken)
+router.get('/personal/:username', authMiddleware, userController.getUserByUserName)
+router.get('/events', authMiddleware, eventController.getEvents)
+router.get('/lists', authMiddleware, listService.getLists)
+router.get('/contacts', authMiddleware, contactController.getContacts)
 router.get('/maillists', authMiddleware, controller.getMailList) 
-router.get('/dashboard', roleMiddleware(['ADMIN']), controller.getUsers)
 router.get('/response/:eventId/:contactId/:response', controller.responseMailList)
 
-router.put('/users', [
+router.put('/users/:id', [
      check('username', "Nombre de usuario no puede estar vacía.").notEmpty(),
      check('email', "Email no puede estar vacío.").notEmpty(),
      check('email', "No es la dirección de correo electrónico.").isEmail(),
-     ], roleMiddleware(['ADMIN','USER']), controller.updateUser)
-router.put('/events', [
+     ], roleMiddleware(['ADMIN','USER']), userController.updateUser)
+router.put('/events/:id', [
      check('name', "El nombre del evento no puede estar vacío").notEmpty(),
-     ], authMiddleware, controller.updateEvent)
-router.put('/contacts',[
+     ], authMiddleware, eventController.updateEvent)
+router.put('/contacts/:id',[
      check('nombre', "Nombre de contacto no puede estar vacía.").notEmpty(),
      check('email', "Email no puede estar vacía.").notEmpty(),
      check('email', "No es la dirección de correo electrónico.").isEmail(),
-     ], authMiddleware, controller.updateContact)
-router.put('/lists', authMiddleware, controller.updateList)
+     ], authMiddleware, contactController.updateContact)
+router.put('/lists', authMiddleware, listService.updateList)
 
 router.patch('/lists', [
      check('cargo', "no hay valores").optional().isArray({ min: 1 }),
@@ -81,19 +87,17 @@ router.patch('/lists', [
      check('entidad', "no hay valores").optional().isArray({ min: 1 }),
      check('categoria', "no hay valores").optional().isArray({ min: 1 }),
      check('territorio', "no hay valores").optional().isArray({ min: 1 }),
-   ], authMiddleware, controller.patchList)
+   ], authMiddleware, listService.patchList)
    
 router.patch('/maillists', [
-     check('contacts', "Seleccione uno o más contactos").isArray({ min: 1 }),
-     check('eventId', "Seleccione uno o más contactos").notEmpty(),
-     check('eventName', "Evento no puede estar vacío").notEmpty()
+     check('eventId', "Seleccione un evento").notEmpty(),
+     check('eventName', "Evento no puede estar vacío").notEmpty(),
+     check('contacts', "Seleccione uno o más contactos").isArray({ min: 1 })
      ], authMiddleware, controller.patchMailList)
 
-router.delete('/events/:id', roleMiddleware(['ADMIN']), controller.deleteEvent)
-router.delete('/users', roleMiddleware(['ADMIN']), controller.deleteUser)
-router.delete('/lists', roleMiddleware(['ADMIN']), controller.deleteListValues)
-router.delete('/contacts/:id', roleMiddleware(['ADMIN']), controller.deleteContacts)
-
-
+router.delete('/events/:id', roleMiddleware(['ADMIN']), eventController.deleteEvent)
+router.delete('/users/:id', roleMiddleware(['ADMIN']), userController.deleteUser)
+router.delete('/lists', roleMiddleware(['ADMIN']), listService.deleteListValues)
+router.delete('/contacts/:id', roleMiddleware(['ADMIN']), contactController.deleteContact)
 
 module.exports = router

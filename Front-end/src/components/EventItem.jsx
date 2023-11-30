@@ -119,7 +119,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - events.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filtered.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -161,7 +161,8 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     try {
       setLoading(true);
       addTokenToHeaders();
-      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/events`);
+      // const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/events`);
+      const response = await axios.get(`http://localhost:5000/events`);
       let fetchedEvents = response.data;
       // console.log("EventItem:", fetchedEvents)
       setEvents(fetchedEvents);
@@ -182,15 +183,9 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     try {
       setLoading(true);
       addTokenToHeaders();
-      // console.log(eventData);
-      // const formData = new FormData();
-      // formData.append('name', eventData.name);
-      // formData.append('description', eventData.description);
-      // formData.append('image', eventData.image);
-      // formData.append('startDate', eventData.startDate);
-      // formData.append('endDate', eventData.endDate);
       const response = await axios.post(
-        "https://p9-remitente.oa.r.appspot.com/events/", eventData, {
+        // "https://p9-remitente.oa.r.appspot.com/events/", eventData, {
+        "http://localhost:5000/events/", eventData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -237,7 +232,8 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         setLoading(true);
         addTokenToHeaders();
         const response = await axios.put(
-          `https://p9-remitente.oa.r.appspot.com/events/?_id=${selectedEvent._id}`, 
+          // `https://p9-remitente.oa.r.appspot.com/events/${selectedEvent._id}`, 
+          `http://localhost:5000/events/${selectedEvent._id}`, 
           eventData);
           let message = response.data.name;
         showSnack(`Evento "${message}" editado correctamente`)
@@ -265,7 +261,8 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
         setLoading(true);
         addTokenToHeaders();
         const response = await axios.delete(`
-        https://p9-remitente.oa.r.appspot.com/events/${selectedEvent}`);
+        // https://p9-remitente.oa.r.appspot.com/events/${selectedEvent}`);
+        http://localhost:5000/events/${selectedEvent}`);
         // let message = response.data.name;
         console.log(response.data);
         setDelOpen(false);
@@ -353,16 +350,16 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="right">
                     <span style={{ color: event.used ? 'red' : 'green' }}>
-                      {event.used ? 'Used' : 'New'}
+                      {event.used ? 'Abierto' : 'Nuevo'}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Tooltip title="Edit">
+                    <Tooltip title="Editar">
                       <IconButton onClick={() => openEditEvent(event)}>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete">
+                    <Tooltip title="Eliminar">
                       <IconButton onClick={() => openDeleteModal(event)}>
                         <DeleteIcon />
                       </IconButton>
@@ -372,7 +369,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
               ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={3} />
               </TableRow>
             )}
           </TableBody>
@@ -381,7 +378,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={3}
-                count={events.length}
+                count={filtered.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{

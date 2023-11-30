@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport(
 );
 
 
-const mailer = (mailMessage) => {
+const mailService = (mailMessage) => {
     return new Promise((resolve, reject) => {
         transporter.sendMail(mailMessage, (err, info) => {
             if (err) {
@@ -26,4 +26,4 @@ const mailer = (mailMessage) => {
 };
 
 
-module.exports = mailer
+module.exports = mailService

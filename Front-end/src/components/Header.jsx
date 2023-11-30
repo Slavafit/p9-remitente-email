@@ -102,7 +102,7 @@ export default function Header( {showMenu, refresh, showPersonal, showSignUp, sh
                                 <ListItemIcon>
                                     <PersonAddAltIcon />
                                 </ListItemIcon>
-                                Agregar usuario
+                                Añadir usuario
                             </MenuItem>
                         )}
                         {userRole === 'ADMIN' && (

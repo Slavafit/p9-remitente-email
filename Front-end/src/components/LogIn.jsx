@@ -129,25 +129,26 @@ export default function LogIn() {
   const authUser = async (email, password) => {
     try {
       // Проверить, есть ли токен в sessionStorage
-      const storedToken = sessionStorage.getItem('token');
+      const storedToken = sessionStorage.getItem('accessToken');
       if (storedToken) {
         // Если токен уже есть в localStorage, используйте его для аутентификации
         axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
         return true;
         } else {
         // Отправить запрос на сервер с именем пользователя и паролем
-        const response = await axios.post('https://p9-remitente.oa.r.appspot.com/login', {
+        // const response = await axios.post('https://p9-remitente.oa.r.appspot.com/login', {
+        const response = await axios.post('http://localhost:5000/login', {
           email,
           password,
         });
-        console.log("response",response);
+        // console.log("response",response);
         // Получить JWT-токен и прочее из ответа сервера
-        const token = response.data.token;
-        const userId = response.data.userData.userId;
-        const username = response.data.userData.username;
-        const userRole = response.data.userData.role;
+        const accessToken = response.data.accessToken;
+        const userId = response.data.userDto.userId;
+        const username = response.data.userDto.username;
+        const userRole = response.data.userDto.roles;
         // Сохранить токен и остальное в sessionStorage или в памяти приложения
-        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('userId', userId);
         sessionStorage.setItem('username', username);
         sessionStorage.setItem('userRole', userRole);

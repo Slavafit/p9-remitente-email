@@ -25,7 +25,6 @@ const ProfilePage = ( {showSnack, open, close} ) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // console.log("personal: ", username);
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -34,9 +33,10 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     try {
       addTokenToHeaders();
       const response = await axios.get(
-        `https://p9-remitente.oa.r.appspot.com/personal/?username=${username}`
+        `https://p9-remitente.oa.r.appspot.com/personal/${username}`
+        // `http://localhost:5000/personal/${username}`
       );
-      setUsers(response.data.user);
+      setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -46,9 +46,9 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     //блок удаления пользователя
     const handleDeleteUser = async () => {
       try {
-        const id = users._id
+        const id = users.userId
         addTokenToHeaders();
-        await axios.delete(`https://p9-remitente.oa.r.appspot.com/users/?_id=${id}`);
+        await axios.delete(`https://p9-remitente.oa.r.appspot.com/users/${id}`);
         setDeleteOpen(false);
       } catch (error) {
         console.error("Error delete user:", error);
@@ -63,14 +63,14 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     };
     const editUser = async (newUsername, newEmail) => {
       try {
-        const id = users._id
+        const id = users.userId
         const userData = {
           username: newUsername,
           email: newEmail,
         };
         addTokenToHeaders();
         const response = await axios.put(
-          `https://p9-remitente.oa.r.appspot.com/users/?_id=${id}`, userData );
+          `https://p9-remitente.oa.r.appspot.com/users/${id}`, userData );
         setUsers(response.data);
         let username = response.data.username;
         localStorage.setItem('username', username);
@@ -98,7 +98,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     };
     const resetPassword = async (oldPassword, newPassword) => {
       try {
-        const id = users._id
+        const id = users.userId
         const userData = {
           oldPassword: oldPassword,
           newPassword: newPassword,
@@ -107,6 +107,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
         addTokenToHeaders();
         const response = await axios.post(
           `https://p9-remitente.oa.r.appspot.com/changepassword/${id}`, userData 
+          // `http://localhost:5000/changepassword/${id}`, userData 
           );
         setResetOpen(false)
         showSnack('success', `Password updated successfully` );

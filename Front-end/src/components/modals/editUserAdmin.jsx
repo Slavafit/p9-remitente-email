@@ -84,7 +84,6 @@ const EditModalAdmin = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
             setEmail("");
             setRol("");
           }}
-          variant="outlined"
           color="success">
             Cancelar
           </Button>

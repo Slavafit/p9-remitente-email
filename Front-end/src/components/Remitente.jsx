@@ -206,7 +206,7 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
       <FormControl sx={{ m: 1,  minWidth: 300 }}>
         <InputLabel id="event-name">Eventos nuevos</InputLabel>
         <Select
-        title="Eventos nuevos"
+        title="Añadir contacto a evento nuevo"
           labelId="event-name"
           value={selectedEvent}
           onChange={handleChange}
@@ -224,7 +224,7 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
         <FormControl sx={{ m: 1, width: 300 }}>
         <InputLabel id="event-name">Eventos abiertos</InputLabel>
         <Select
-          title="eventos abiertos"
+          title="Añadir contacto a evento abierto "
           labelId="event-name"
           value={selmailLists}
           onChange={handleEventUsedChange}

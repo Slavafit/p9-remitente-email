@@ -26,16 +26,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     setAuth(true);
-    sessionStorage.setItem("auth", "true");
     showSnack('success', 'Has iniciado sesión correctamente')
   };
 
   const logout = () => {
-    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('username');
     sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('auth');
     setAuth(false);
     showSnack('success', 'Has terminado tu sesion')
   };

@@ -23,10 +23,11 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
 const columns = [
-  { id: 'username', label: 'Username' },
-  { id: 'email', label: 'Email',  },
+  { id: 'username', label: 'Username'},
+  { id: 'email', label: 'Email', },
   { id: 'roles', label: 'Roles', minWidth: 200 },
-  { id: 'actions', label: 'Actions', align: "left" },
+  { id: 'isActivated', label: 'Activate', minWidth: 100 },
+  // { id: 'actions', label: 'Actions' },
 ];
 
 
@@ -38,7 +39,6 @@ export default function UsersTable( {showSnack, open, close} ) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userDeleteId, setUserDeleteId] = useState(null);
-
 
   const fetchUsers = async () => {
     try {
@@ -70,7 +70,7 @@ export default function UsersTable( {showSnack, open, close} ) {
       };
       addTokenToHeaders();
       const response = await axios.put(
-        `https://p9-remitente.oa.r.appspot.com/users/?_id=${selectedUser._id}`, 
+        `https://p9-remitente.oa.r.appspot.com/users/${selectedUser._id}`, 
         userData
         );
       showSnack(`New username: "${response.data.username}", new email: ${response.data.email}`);
@@ -96,10 +96,10 @@ export default function UsersTable( {showSnack, open, close} ) {
       try {
         addTokenToHeaders();
         const response = await axios.delete(
-          `https://p9-remitente.oa.r.appspot.com/users/?_id=${userDeleteId._id}`
+          `https://p9-remitente.oa.r.appspot.com/users/${userDeleteId._id}`
           );
         if (response.status === 200) {
-          showSnack(`"${userDeleteId.username}" was deleted successfully`);
+          showSnack(`Usuario "${userDeleteId.username}" eliminado exitosamente`);
           setTimeout(() => {
             fetchUsers();
           }, 1000);
@@ -149,11 +149,18 @@ export default function UsersTable( {showSnack, open, close} ) {
                         <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                           {columns.map((column) => {
                             const value = row[column.id];
+                            let cellContent = value;
+                            let cellStyle = {}; // Объект для стиля ячейки
+                            if (column.id === 'isActivated' && typeof value === 'boolean') {
+                              cellContent = value ? 'Activated' : 'Not activated';
+                              // Настройка цвета в зависимости от значения
+                              cellStyle.color = value ? 'green' : 'red';
+                            } else if (column.format && typeof value === 'number') {
+                              cellContent = column.format(value);
+                            }
                             return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === 'number'
-                                  ? column.format(value)
-                                  : value}
+                              <TableCell key={column.id} align={column.align} style={cellStyle}>
+                                {cellContent}
                               </TableCell>
                             );
                           })}

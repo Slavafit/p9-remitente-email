@@ -66,7 +66,6 @@ const EditModal = ({ editOpen, handleClose, onSubmit, selectedUser }) => {
             setUsername("");
             setEmail("");
           }}
-          variant="outlined"
           color="success">
             Cancelar
           </Button>

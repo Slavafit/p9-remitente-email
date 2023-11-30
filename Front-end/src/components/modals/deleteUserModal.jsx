@@ -11,10 +11,10 @@ const DeleteUserModal = ({ deleteOpen, deleteClose, onDelete }) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={deleteClose} color="primary">
+        <Button onClick={deleteClose} color="success">
           Cancelar
         </Button>
-        <Button onClick={onDelete} color="primary">
+        <Button onClick={onDelete} color="primary" variant="outlined">
           Borrar
         </Button>
       </DialogActions>

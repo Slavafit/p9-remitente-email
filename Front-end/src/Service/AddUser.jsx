@@ -49,11 +49,12 @@ export default function SignUp( {showSnack, open, close} ) {
       [name]: "", // Сбрасываем сообщение об ошибке при изменении поля
     });
   };
-
+  
   const handleSubmit = async (event) => {
+    console.log(event);
     event.preventDefault(); // Предотвращаем отправку формы по умолчанию
     const form = event.currentTarget;
-  
+    console.log(form);
     // Проверяем на пустые поля и устанавливаем сообщения об ошибках при необходимости
     let hasErrors = false;
     const newErrorMessages = { ...errorMessages };
@@ -118,6 +119,7 @@ export default function SignUp( {showSnack, open, close} ) {
 
   return (
     <Dialog open={open} onClose={close}>
+      <form onSubmit={handleSubmit}>
       <DialogContent sx={{padding: 3, bgcolor: 'grey.300'}}>
         <Box
           sx={{
@@ -134,7 +136,7 @@ export default function SignUp( {showSnack, open, close} ) {
           <Typography component="h1" variant="h5">
             Añadir nuevo usuario
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2}}>
+          <Box sx={{ mt: 2}}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -249,6 +251,7 @@ export default function SignUp( {showSnack, open, close} ) {
           </Button>
         </DialogActions>
       </DialogContent>
+      </form>
     </Dialog>
   )
 }

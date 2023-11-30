@@ -2,10 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const router = require('./router');
+const router = require('./router/router');
 const PORT = process.env.PORT || 5000;
 const app = express();
 const multer = require('multer');
+const cookieParser = require('cookie-parser');
+const errorMiddleware = require('./middlewares/errorMiddleware');
 
 // Настройка multer для сохранения файлов в папке uploads
 const storage = multer.diskStorage({
@@ -24,7 +26,9 @@ app.use(upload.single('image'));
 // Разрешите CORS для всех запросов
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use("/", router);
+app.use(errorMiddleware);
 
 const start = async () => {
     try {

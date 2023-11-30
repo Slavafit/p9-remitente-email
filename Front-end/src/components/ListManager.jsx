@@ -159,7 +159,6 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
         const updatedData = { ...lists };
         const valueToDelete = updatedData[listName][itemIndex];
         updatedData[listName] = updatedData[listName].filter((_, index) => index !== itemIndex);
-        // console.log("updatedData after deletion:",updatedData);
         const response = await axios.put(`https://p9-remitente.oa.r.appspot.com/lists/`, updatedData);
         if (response.status === 200) {
           setDelOpen(false);
@@ -253,15 +252,10 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
             <EditRoundedIcon onClick={handleEditItem}/>
           </IconButton>
         </FormControl>
-
           <IconButton sx={{ m: 1, ml: 6 }} size="large"
             title="Delete elemento de valor" onClick={()=>{setDelOpen(true)}}>
             <DeleteIcon />
           </IconButton>
-
-
-          {/* <Button variant="outlined" onClick={handleDeleteItem}>Delete Item</Button> */}
-
       </Paper>
       </Box>
         <DeleteValueModal

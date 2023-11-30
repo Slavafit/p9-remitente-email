@@ -12,6 +12,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 
 const AddEventModal = ({ open, onSubmit, close }) => {
   const [eventData, setEventData] = useState({
@@ -101,10 +102,10 @@ const AddEventModal = ({ open, onSubmit, close }) => {
               accept="image/*,.png,.jpeg,.jpg,.web,.pdf"
               onChange={handleImageChange}
             />
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="DE">
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               <DesktopDateTimePicker
                 label="Fecha y hora de inicio"
-                value={eventData.startDate}
+                value={dayjs(eventData.startDate)}
                 onChange={(newDate) => handleDateTimeChange(newDate, 'startDate')}
                 renderInput={(params) => <TextField {...params} />}
                 />

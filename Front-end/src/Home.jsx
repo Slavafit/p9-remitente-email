@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Container } from "@mui/material"
 import Header from "./components/Header"
-import LeftMenu from "./components/LeftMenu"
 import Search from './components/Search'
 import EventTable from './components/EventItem';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -186,20 +185,6 @@ function Home() {
           </AccordionDetails>
         </Accordion>
         </Container>
-        <LeftMenu
-          menuOpen={isMenuOpen}
-          menuClose={() => setMenuOpen(false)}
-          onEventTable={() => {
-            setDisplayItem('EventTable'); // При выборе EventTable скрываем MailItem
-            setDisplayMail(null);
-            setShowPersonal(false);
-          }}
-          onMailItem={() => {
-            setDisplayMail('MailItem'); // При выборе MailItem скрываем EventTable
-            setDisplayItem(null);
-            setShowPersonal(false);
-          }}
-        />
         {showPersonal && (
           <ProfilePage
             showSnack={(title, message)=>handleShowSnack(title, message)}

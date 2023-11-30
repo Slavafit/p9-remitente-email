@@ -62,7 +62,8 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
     try {
       setLoading(true);
       addTokenToHeaders();
-      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/contacts`);
+      // const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/contacts`);
+      const response = await axios.get(`http://localhost:5000/contacts`);
       let fetchedContacts = response.data;
       // console.log("Contact:", fetchedContacts)
       setContacts(fetchedContacts);
@@ -87,7 +88,6 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
       const response = await axios.post(
         "https://p9-remitente.oa.r.appspot.com/contacts/", contactData);
       setAddOpen(false);
-      // console.log(response.data);
       showSnack('success', response.data.message);
       setTimeout(() => {
         fetchContacts();
@@ -128,7 +128,7 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
         setLoading(true);
         // console.log(contactData)
         const response = await axios.put(
-          `https://p9-remitente.oa.r.appspot.com/contacts/?_id=${selContact._id}`, contactData);
+          `https://p9-remitente.oa.r.appspot.com/contacts/${selContact._id}`, contactData);
           let message = response.data.nombre
         if (response.status === 200) {
           closeEditModal();
