@@ -7,8 +7,7 @@ import {Select, FormControl, InputLabel, OutlinedInput, MenuItem, Stack} from '@
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import Fab from '@mui/material/Fab';
-import { addTokenToHeaders } from "../service/addTokenToHeaders";
-import axios from 'axios';
+import axiosInstance from '../service/interceptor';
 
 
 const StyledFab = styled(Fab)({
@@ -146,23 +145,21 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
           eventName: selectedEvent,
           contacts: selectedIds
         };
-
-        addTokenToHeaders();
-        const response = await axios.post(`https://p9-remitente.oa.r.appspot.com/maillists`, mailData);
+        const response = await axiosInstance.post(`/maillists`, mailData);
         let responseData = response.data.message;
-        // console.log(responseData);
-        showSnack('success', responseData);
+        showSnack(responseData);
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          // showSnack(resError);
-          showSnack('warning', resError);
+          showSnack('Atención:', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
-          const resError = error.response.data.errors[0].message;
-          showSnack('warning', resError);
+          const resError = error.response.data.errors;
+          const errorMessages = resError.map(error => error.message);
+          const errorString = errorMessages.join(', ');
+          showSnack('Atención:', errorString);
       } else {
           console.error("Error post MailList:", error);
-          showSnack('Error post MailList');
+          showSnack('Error','Error post MailList');
         }
       }
     };
@@ -176,21 +173,21 @@ export default function Remitente({showSnack, contacts, events, mailLists}) {
           eventName: existeEvent,
           contacts: selectedIds
         };
-        console.log(mailData);
-        addTokenToHeaders();
-        const response = await axios.patch(`https://p9-remitente.oa.r.appspot.com/maillists`, mailData);
+        const response = await axiosInstance.patch(`/maillists`, mailData);
         let responseData = response.data.message;
         showSnack(responseData);
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          showSnack('warning', resError);
+          showSnack('Atención:', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
-          const resError = error.response.data.errors[0].message;
-          showSnack('warning', resError);
+          const resError = error.response.data.errors;
+          const errorMessages = resError.map(error => error.message);
+          const errorString = errorMessages.join(', ');
+          showSnack('Atención:', errorString);
       } else {
           console.error("Error patch MailList:", error);
-          showSnack('warning','Error patch MailList');
+          showSnack('Atención:','Error patch MailList');
         }
       }
     };

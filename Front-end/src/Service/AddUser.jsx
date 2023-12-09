@@ -9,9 +9,8 @@ import TextField from '@mui/material/TextField';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
 import Grid from '@mui/material/Grid';
-import axios from "axios";
 import { styled } from '@mui/material/styles';
-import { addTokenToHeaders } from "./addTokenToHeaders";
+import axiosInstance from '../service/interceptor';
 
 
 const TinyText = styled(Typography)({
@@ -83,9 +82,7 @@ export default function SignUp( {showSnack, open, close} ) {
 
     if (!hasErrors) {
       try {
-        addTokenToHeaders();
-        const response = await axios.post(
-          "https://p9-remitente.oa.r.appspot.com/registration", formData);
+        const response = await axiosInstance.post("/registration", formData);
         let responseMessage = response.data.message;
         showSnack('success', responseMessage);
         close();
@@ -103,11 +100,11 @@ export default function SignUp( {showSnack, open, close} ) {
           console.error("Server error:", error.response);
           let responseError = error.response.data.error;
           let responseMessage = error.response.data.message;
-          showSnack('warning', responseMessage);
+          showSnack('Atención:', responseMessage);
         } else {
           console.error("Error sending data:", error);
           const resMessage = error.response.data.errors[0];
-          showSnack('warning', resMessage.message);
+          showSnack('Atención:', resMessage.message);
         }
       }
     }

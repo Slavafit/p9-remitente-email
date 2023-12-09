@@ -7,37 +7,38 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
-import axios from "axios";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import LockResetIcon from '@mui/icons-material/LockReset';
 import DeleteIcon from "@mui/icons-material/Delete";
-import { addTokenToHeaders } from "./service/addTokenToHeaders";
 import EditModal from "./components/modals/editUserModal";
 import DeleteUserModal from "./components/modals/deleteUserModal";
 import ChangePasswordModal from "./components/modals/changePassModal";
-
+import axiosInstance from './service/interceptor'
 
 const ProfilePage = ( {showSnack, open, close} ) => {
-  const [users, setUsers] = useState(true);
+  const [users, setUsers] = useState('');
   let username = sessionStorage.getItem('username');
   const [editOpen, setEditOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+    console.log(" users",users);
+    console.log(" open",open);
 
   useEffect(() => {
-    fetchUsers();
+      console.log("вызов useEffect");
+      fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
     try {
-      addTokenToHeaders();
-      const response = await axios.get(
-        `https://p9-remitente.oa.r.appspot.com/personal/${username}`
-        // `http://localhost:5000/personal/${username}`
-      );
-      setUsers(response.data);
+      console.log("вызов fetchUsers");
+      const usersResponse = await axiosInstance.get(`/personal/${username}`);
+      const userData = usersResponse.data;
+      setUsers(userData);
     } catch (error) {
+      let err = error.response.data
+      showSnack('Error',`${err.message}`);
       console.error("Error fetching users:", error);
     }
   };
@@ -47,8 +48,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
     const handleDeleteUser = async () => {
       try {
         const id = users.userId
-        addTokenToHeaders();
-        await axios.delete(`https://p9-remitente.oa.r.appspot.com/users/${id}`);
+        await axiosInstance.delete(`/users/${id}`);
         setDeleteOpen(false);
       } catch (error) {
         console.error("Error delete user:", error);
@@ -68,9 +68,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
           username: newUsername,
           email: newEmail,
         };
-        addTokenToHeaders();
-        const response = await axios.put(
-          `https://p9-remitente.oa.r.appspot.com/users/${id}`, userData );
+        const response = await axiosInstance.put(`/users/${id}`, userData );
         setUsers(response.data);
         let username = response.data.username;
         localStorage.setItem('username', username);
@@ -79,13 +77,13 @@ const ProfilePage = ( {showSnack, open, close} ) => {
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          showSnack('warning', resError);
+          showSnack('Atención:', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
           const resError = error.response.data.errors[0].message;
-          showSnack('warning', resError);
+          showSnack('Atención:', resError);
       } else {
           console.error("Error updating user:", error);
-          showSnack('warning', 'Error updating user');
+          showSnack('Atención:', 'Error updating user');
         }
       }
     };
@@ -103,25 +101,20 @@ const ProfilePage = ( {showSnack, open, close} ) => {
           oldPassword: oldPassword,
           newPassword: newPassword,
         };
-        // console.log(id,userData);
-        addTokenToHeaders();
-        const response = await axios.post(
-          `https://p9-remitente.oa.r.appspot.com/changepassword/${id}`, userData 
-          // `http://localhost:5000/changepassword/${id}`, userData 
+        const response = await axiosInstance.post(`/changepassword/${id}`, userData 
           );
         setResetOpen(false)
-        showSnack('success', `Password updated successfully` );
+        showSnack(`Password updated successfully` );
       } catch (error) {
         if ( error.response.data && error.response.data.message) {
           const resError = error.response.data.message;
-          // showSnack(resError);
-          showSnack('warning', resError);
+          showSnack('Atención:', resError);
       } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
           const resError = error.response.data.errors[0].message;
-          showSnack('warning', resError);
+          showSnack('Atención:', resError);
       } else {
           console.error("Error update password:", error);
-          showSnack('warning', 'Error update password');
+          showSnack('Atención:', 'Error update password');
         }
       }
     };
@@ -151,7 +144,7 @@ const ProfilePage = ( {showSnack, open, close} ) => {
                 bgcolor: "primary.main",
               }}
             >
-              {username.charAt(0)}
+              {username ? username.charAt(0) : ''}
             </Avatar>
               <Typography variant="h5" component="h1">
                 {users.username}

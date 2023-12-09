@@ -25,8 +25,7 @@ import Stack from '@mui/material/Stack';
 import AddEventModal from "./modals/addEventModal"
 import EditEnventModal from "./modals/editEventModal"
 import DeleteEventModal from "./modals/deleteEventModal"
-import axios from "axios";
-import { addTokenToHeaders } from "../service/addTokenToHeaders"; 
+import axiosInstance from '../service/interceptor';
 import ImageModal from "./modals/imageModal";
 
 const StyledFab = styled(Fab)({
@@ -105,7 +104,6 @@ TablePaginationActions.propTypes = {
 
 
 const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag }) => {
-  // console.log(search);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [events, setEvents] = React.useState([]);
@@ -160,9 +158,7 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      addTokenToHeaders();
-      // const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/events`);
-      const response = await axios.get(`http://localhost:5000/events`);
+      const response = await axiosInstance.get(`/events`);
       let fetchedEvents = response.data;
       // console.log("EventItem:", fetchedEvents)
       setEvents(fetchedEvents);
@@ -182,33 +178,27 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
   const handleAddEvent = async (eventData) => {
     try {
       setLoading(true);
-      addTokenToHeaders();
-      const response = await axios.post(
-        // "https://p9-remitente.oa.r.appspot.com/events/", eventData, {
-        "http://localhost:5000/events/", eventData, {
+      const response = await axiosInstance.post("/events/", eventData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
       setAddOpen(false);
       showSnack('success', response.data.message);
-      setTimeout(() => {
-        fetchEvents();
-      }, 2000);
+      fetchEvents();
       // console.log("Event created:", response.data.message);
       setLoading(false);
     } catch (error) {
       if ( error.response.data && error.response.data.message) {
         const resError = error.response.data.message;
         console.error("Error create event:", error);
-        // showSnack(resError);
-        showSnack('warning', resError);
+        showSnack('Atención:', resError);
     } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
         const resError = error.response.data.errors[0].message;
-        showSnack('warning', resError);
+        showSnack('Atención:', resError);
     } else {
         console.error("Network error:", error);
-        showSnack('warning', 'Network error');
+        showSnack('Atención:', 'Network error');
       }
     }
   };
@@ -230,17 +220,12 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
       try {
         console.log(eventData);
         setLoading(true);
-        addTokenToHeaders();
-        const response = await axios.put(
-          // `https://p9-remitente.oa.r.appspot.com/events/${selectedEvent._id}`, 
-          `http://localhost:5000/events/${selectedEvent._id}`, 
+        const response = await axiosInstance.put(`/events/${selectedEvent._id}`, 
           eventData);
           let message = response.data.name;
         showSnack(`Evento "${message}" editado correctamente`)
           console.log(response.data);
-        setTimeout(() => {
           fetchEvents();
-        }, 2000);
         closeEditModal();
         setLoading(false);
       } catch (error) {
@@ -259,16 +244,13 @@ const EventTable = (({ showSnack, search, updateEvents, setLoading, refreshFlag 
     const handleDeleteEvent = async () => {
       try {
         setLoading(true);
-        addTokenToHeaders();
-        const response = await axios.delete(`
-        // https://p9-remitente.oa.r.appspot.com/events/${selectedEvent}`);
-        http://localhost:5000/events/${selectedEvent}`);
+        const response = await axiosInstance.delete(`/events/${selectedEvent}`);
         // let message = response.data.name;
         console.log(response.data);
         setDelOpen(false);
         fetchEvents();
         setLoading(false);
-        showSnack('warning', `El evento se ha eliminado correctamente`);
+        showSnack('Atención:', `El evento se ha eliminado correctamente`);
       } catch (error) {
         console.error("Error delete event:", error);
       }

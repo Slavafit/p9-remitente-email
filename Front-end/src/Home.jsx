@@ -157,7 +157,7 @@ function Home() {
         </Accordion>
         <Accordion sx={{ backgroundColor: 'grey.200' }} expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography  title="open/close contacts">Gestión de сontactos</Typography>
+            <Typography title="open/close contacts">Gestión de сontactos</Typography>
           </AccordionSummary>
           <AccordionDetails>
               <ContactTable

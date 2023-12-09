@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-Atención:s 0",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage"
@@ -16,6 +16,7 @@
     "@mui/material": "^5.14.17",
     "@mui/x-data-grid": "^6.18.0",
     "@mui/x-date-pickers": "^6.17.0",
+    "axios": "^1.6.2",
     "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
     "react": "^18.2.0",

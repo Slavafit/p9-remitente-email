@@ -2,9 +2,9 @@ const ApiError = require('../errors/api-error'); //импорт класса о�
 const tokenService = require('../service/tokenService');
 
 module.exports = function (req, res, next) {
-    if (req.method === "OPTIONS") {
-        next();
-    }
+    // if (req.method === "OPTIONS") {
+    //     next();
+    // }
     try {
         //проверяю есть ли accessToken
         const authorization = req.headers.authorization;
@@ -18,7 +18,7 @@ module.exports = function (req, res, next) {
         }
         const userData = tokenService.validateAccessToken(accessToken); //расшифровываю токен
         if(!userData) {
-            return next(ApiError.UnauthorizedError(403));
+            return next(ApiError.UnauthorizedError(401));
         }
         req.user = userData;
         next();

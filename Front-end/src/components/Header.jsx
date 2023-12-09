@@ -13,7 +13,7 @@ import Menu from '@mui/material/Menu';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useAuth } from "../service/AuthContext";
+import { useAuth } from "../service/Context";
 import { useNavigate } from "react-router-dom";
 
 

@@ -89,7 +89,7 @@ class userService {
         const userDto = new UserDto(user);  //userId, username, role, email
         //генерирую токены и отправляю клиенту
         // const tokens = tokenService.generateTokens(user._id, user.roles);
-        const tokens = tokenService.generateTokens({...userDto, roles:user.roles});
+        const tokens = tokenService.generateTokens({...userDto});
         //записываю токен в базу
         await tokenService.saveToken(userDto.userId, tokens.refreshToken);
         // const userData = {userId: user._id, username: user.username, role: user.roles[0]}
@@ -112,7 +112,7 @@ class userService {
         }
         // Проверяем, совпадает ли переданный activationLink с сохраненным значением в модели пользователя
         if (user.activationLink !== activationLink) {
-            throw ApiError.BadRequest(401, 'Enlace de activación inválido');
+            throw ApiError.BadRequest(400, 'Enlace de activación inválido');
         }
         //проверяю, активировался ли пользователь
         if (user.isActivated) {
@@ -265,7 +265,8 @@ class userService {
     //получить список пользователей
     async getUsers() {
             const users = await UserModel.find()
-            return users;
+            const userDtos = users.map(user => new UserDto(user));
+            return userDtos;
     };
     //обработчик получения данных по username
     async getUserByUsername(username) {
@@ -276,24 +277,24 @@ class userService {
         const userDto = new UserDto(user);  //userId, username, role, email
         return userDto;
     };
-
+    //обновляем refreshToken
     async refresh(refreshToken) {
-        if (!refreshToken) {
+        if (!refreshToken) {    //проверка, если токена нет
             throw ApiError.UnauthorizedError(401);
         }
         const userData = tokenService.validateRefreshToken(refreshToken);   //валидирую токен
-        const tokenFromDB = await tokenService.findToken(refreshToken);     //ищу токен в БД
+        const tokenFromDB = await tokenService.findToken(refreshToken);     //ищу токен в Б
         if (!userData || !tokenFromDB) {
+            console.log("401");
             throw ApiError.UnauthorizedError(401);
         }
-        const user = await UserModel.findById(userData.id)  //ищу по id из payload
+        const user = await UserModel.findById(userData.id.userId)  //ищу по id из payload
         //создаем ДТО с данными пользователя
         const userDto = new UserDto(user);  //userId, username, role, email
         //генерирую токены и отправляю клиенту
         const tokens = tokenService.generateTokens({...userDto, roles:user.roles});
         //записываю токен в базу
         await tokenService.saveToken(userDto.userId, tokens.refreshToken);
-        // const userData = {userId: user._id, username: user.username, role: user.roles[0]}
         return ({...tokens, userDto})
     }
 }

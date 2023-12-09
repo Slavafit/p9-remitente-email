@@ -1,4 +1,3 @@
-const UserModel = require('../models/UserModel');
 const userService = require('../service/userService')
 const { validationResult } = require('express-validator')
 require('dotenv').config();
@@ -47,7 +46,8 @@ class userController {
             const { email, password } = req.body   //получили данные от клиента
             //вызываю сервис
             const userData = await userService.login(email, password);
-            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
+            res.cookie('refreshToken', userData.refreshToken, 
+            {maxAge: 30*24*60*60*1000, httpOnly: true});
             //возвращаю данные на клиент
             return res.json({accessToken: userData.accessToken, userDto: userData.userDto})
         } catch (e) {
@@ -71,10 +71,10 @@ class userController {
         try {
             const {refreshToken} = req.cookies;
             const userData = await userService.refresh(refreshToken);
-            res.cookie('refreshToken', userData.tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
+            res.cookie('refreshToken', userData.refreshToken,
+            {maxAge: 30*24*60*60*1000, httpOnly: true})
             //возвращаю данные на клиент
-            console.log(userData);
-            return res.json(userData.tokens)
+            return res.json(userData)
         } catch (e) {
             next(e);
         }
@@ -107,7 +107,7 @@ class userController {
     async getUserByUserName(req, res, next) {
         try {
             const { username } = req.params;
-            // console.log("Received getUserByUsername request with:", username);
+            console.log("Received getUserByUsername request with:", username);
             const user = await userService.getUserByUsername(username);    
             //отдаем на клиент данные с userService
             return res.json(user)

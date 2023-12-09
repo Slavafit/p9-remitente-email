@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Grid from '@mui/material/Grid';
 import axios from "axios";
 import { styled } from '@mui/material/styles';
-import { useAuth } from './AuthContext';
+import { useAuth } from './Context';
 
 
 const TinyText = styled(Typography)({
@@ -81,11 +81,11 @@ export default function ForgotPassword( { open, close } ) {
           console.error("Server error:", error.response);
           let responseError = error.response.data.error;
           let responseMessage = error.response.data.message;
-          showSnack('warning', responseMessage);
+          showSnack('Atención:', responseMessage);
         } else {
           console.error("Error sending data:", error);
           const resMessage = error.response.data.errors[0];
-          showSnack('warning', resMessage.message);
+          showSnack('Atención:', resMessage.message);
         }
       }
     }

@@ -7,9 +7,9 @@ import Alert from '@mui/material/Alert';
   export default function Snack({ snackOpen, handleClose, title, message }) {
 
     let severity = 'success';
-    if (title === 'warning') {
+    if (title === 'Atención:') {
       severity = 'warning';
-    } else if (title === 'error') {
+    } else if (title === 'Error') {
       severity = 'error';
     }
 

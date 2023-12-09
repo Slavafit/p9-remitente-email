@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   IconButton,
   Button,
@@ -10,7 +9,7 @@ import {
 } from "@mui/material";
 import EditModalAdmin from "./components/modals/editUserAdmin";
 import DeleteUserModal from "./components/modals/deleteUserModal"
-import { addTokenToHeaders } from './service/addTokenToHeaders';
+import { api } from './service/addTokenToHeaders';
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Paper from '@mui/material/Paper';
@@ -21,13 +20,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import axiosInstance from './service/interceptor';
+
 
 const columns = [
   { id: 'username', label: 'Username'},
   { id: 'email', label: 'Email', },
-  { id: 'roles', label: 'Roles', minWidth: 200 },
-  { id: 'isActivated', label: 'Activate', minWidth: 100 },
-  // { id: 'actions', label: 'Actions' },
+  { id: 'roles', label: 'Roles', minWidth: 170 },
+  { id: 'isActivated', label: 'Activate', minWidth: 50 },
+  // { id: 'actions', label: 'Actions', minWidth: 20},
 ];
 
 
@@ -42,10 +43,13 @@ export default function UsersTable( {showSnack, open, close} ) {
 
   const fetchUsers = async () => {
     try {
-      addTokenToHeaders();
-      const response = await axios.get("https://p9-remitente.oa.r.appspot.com/users");
+      const response = await axiosInstance.get("/users");
+      console.log(response.data);
+
       setUsers(response.data);
     } catch (error) {
+      let err = error.response.data
+      showSnack('Error',`${err.message}`);
       console.error("Error fetching users:", error);
     }
   };
@@ -68,9 +72,7 @@ export default function UsersTable( {showSnack, open, close} ) {
         email: newEmail,
         roles: newRol
       };
-      addTokenToHeaders();
-      const response = await axios.put(
-        `https://p9-remitente.oa.r.appspot.com/users/${selectedUser._id}`, 
+      const response = await api.put(`/users/${selectedUser._id}`, 
         userData
         );
       showSnack(`New username: "${response.data.username}", new email: ${response.data.email}`);
@@ -78,7 +80,7 @@ export default function UsersTable( {showSnack, open, close} ) {
       setShowEditModal(false);
     } catch (error) {
       let err = error.response.data.errors[0]
-      showSnack(`Error: ${err.message}`);
+      showSnack('Error', `${err.message}`);
       console.error("Error updating user:", error);
     }
   };
@@ -94,15 +96,10 @@ export default function UsersTable( {showSnack, open, close} ) {
     //метод удаления delete
     const deleteUser = async () => {
       try {
-        addTokenToHeaders();
-        const response = await axios.delete(
-          `https://p9-remitente.oa.r.appspot.com/users/${userDeleteId._id}`
-          );
+        const response = await api.delete(`/users/${userDeleteId._id}`);
         if (response.status === 200) {
           showSnack(`Usuario "${userDeleteId.username}" eliminado exitosamente`);
-          setTimeout(() => {
-            fetchUsers();
-          }, 1000);
+          fetchUsers();
         };
         setShowDeleteModal(false);
         
@@ -125,8 +122,8 @@ export default function UsersTable( {showSnack, open, close} ) {
     <>
       <Dialog open={open} onClose={close}>
       <DialogTitle>Usuarios</DialogTitle>
-        <DialogContent sx={{height: 'auto', width: '100%', padding: 3, backgroundColor: 'grey.100'}}>
-          <Paper sx={{boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)', backgroundColor: 'grey.300'}}>
+        <DialogContent sx={{  backgroundColor: 'grey.100'}}>
+          <Paper sx={{width: '100%', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)', backgroundColor: 'grey.300'}}>
             <TableContainer>
               <Table>
                 <TableHead>

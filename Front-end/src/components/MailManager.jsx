@@ -16,15 +16,14 @@ import TableHead from '@mui/material/TableHead';
 import TableFooter from '@mui/material/TableFooter';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
-import { styled, useTheme} from '@mui/material/styles';
+import { useTheme} from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import axios from 'axios';
 import Stack from '@mui/material/Stack';
-import { addTokenToHeaders } from "../service/addTokenToHeaders";
+import axiosInstance from '../service/interceptor';
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -130,8 +129,7 @@ const MailManager = ({ events, contacts, showSnack, search, setLoading, refreshF
   const fetchMailLists = async () => {
     try {
       setLoading(true);
-      addTokenToHeaders();
-      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/maillists`);
+      const response = await axiosInstance.get(`/maillists`);
       let fetchedData = response.data;
       setMailList(fetchedData);
       setLoading(false);

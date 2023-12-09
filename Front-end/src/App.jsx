@@ -8,13 +8,13 @@ import {
   Routes,
   useNavigate
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./service/AuthContext";
+import { AuthProvider, useAuth } from "./service/Context";
 import ResetPasswordPage from './service/ResetPassword'
 
 
 
 const ProtectedRoute = ({ element }) => {
-  const { auth } = useAuth(); // Получите состояние авторизации из вашего AuthContext
+  const { auth } = useAuth(); // Получите состояние авторизации из вашего Context
   const navigate = useNavigate();
 
 
@@ -28,7 +28,6 @@ const ProtectedRoute = ({ element }) => {
 };
 
 function App() {
-
 
   return (
     <>

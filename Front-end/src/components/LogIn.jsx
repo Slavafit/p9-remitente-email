@@ -14,12 +14,13 @@ import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/donbosco_logo.png";
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import { useAuth } from '../service/AuthContext'
+import { useAuth } from '../service/Context'
 import ForgotPassword from '../service/ForgotPassword';
 import axios from 'axios';
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import axiosInstance from '../service/interceptor';
 
 
 const WallPaper = styled('div')(({ theme }) => ({
@@ -60,7 +61,7 @@ const TinyText = styled(Typography)({
 
 export default function LogIn() {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('')
+    const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [isPassValid, setIsPassValid] = useState(false);
@@ -69,7 +70,6 @@ export default function LogIn() {
     const { login } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
-    const { showSnack } = useAuth();
 
     useEffect(() => {
         // есть ли сохраненные данные в localStorage
@@ -83,7 +83,7 @@ export default function LogIn() {
         }
         }, []);
 
-    // Эффект для отслеживания изменений в поле email
+    // Эффект для отслеживания изменений в поле email, пароль
     useEffect(() => {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         setIsEmailValid(emailPattern.test(email));
@@ -128,38 +128,28 @@ export default function LogIn() {
     // Функция для аутентификации пользователя
   const authUser = async (email, password) => {
     try {
-      // Проверить, есть ли токен в sessionStorage
-      const storedToken = sessionStorage.getItem('accessToken');
-      if (storedToken) {
-        // Если токен уже есть в localStorage, используйте его для аутентификации
-        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-        return true;
-        } else {
         // Отправить запрос на сервер с именем пользователя и паролем
-        // const response = await axios.post('https://p9-remitente.oa.r.appspot.com/login', {
-        const response = await axios.post('http://localhost:5000/login', {
+        const response = await axiosInstance.post('/login', {
           email,
           password,
         });
-        // console.log("response",response);
         // Получить JWT-токен и прочее из ответа сервера
         const accessToken = response.data.accessToken;
         const userId = response.data.userDto.userId;
         const username = response.data.userDto.username;
         const userRole = response.data.userDto.roles;
         // Сохранить токен и остальное в sessionStorage или в памяти приложения
-        sessionStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('userId', userId);
         sessionStorage.setItem('username', username);
         sessionStorage.setItem('userRole', userRole);
         // Вернуть успех
         return true;
       }
-    } catch (error) {
+     catch (error) {
       // Вернуть ошибку аутентификации
       const response = error.response.data.message
       console.log("Error authUser", response);
-      showSnack('warning', response);
       return false;
     }
   };
@@ -190,11 +180,11 @@ export default function LogIn() {
               </Typography>
               <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                 <TextField
-                  margin="normal"
                   required
                   fullWidth
-                  label="Email"
+                  label="Correo electrónico"
                   name="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -208,7 +198,6 @@ export default function LogIn() {
                   </TinyText>
                 )}
                 <TextField
-                  margin="normal"
                   required
                   fullWidth
                   name="password"

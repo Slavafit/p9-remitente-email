@@ -10,8 +10,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import _ from 'lodash';
-import axios from 'axios';
-import { addTokenToHeaders } from "../service/addTokenToHeaders";
+import axiosInstance from '../service/interceptor';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -56,15 +55,22 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
   const fetchLists = async () => {
     try {
       setLoading(true);
-      addTokenToHeaders();
-      const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/lists`);
-      let fetchedLists = response.data[0]; // Получаем первый объект из массива
-      // console.log("get",fetchedLists);
+      const responseData = await axiosInstance.get(`/lists`);
+      let response = responseData.data.message;
+      let fetchedLists = responseData.data[0]; // Получаем первый объект из массива
       setLists(fetchedLists);
       updateLists(fetchedLists)
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching lists:", error);
+      console.error("error",error);
+
+      if ( error.response.data && error.response.data.message) {
+        const resError = error.response.data.message;
+        showSnack('Atención:', resError);
+    } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
+        const resError = error.response.data.errors[0].message;
+        showSnack('Atención:', resError);
+    } 
     }
   };
 
@@ -85,29 +91,27 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
   const handleAddItem = (listName) => async () => {
     try {
       setLoading(true);
-      addTokenToHeaders();
       const updatedList = {
         _id: lists._id,
         [listName]: [...lists[listName], newItems[listName]] // Добавить новый элемент к массиву
       };
       // console.log("post-patch",updatedList)
-      const response = await axios.patch(`https://p9-remitente.oa.r.appspot.com/lists/`,updatedList);
-      console.log(response.data);
+      const response = await axiosInstance.patch(`/lists/`,updatedList);
       let responseData = response.data.message;
-      showSnack('success', responseData);
+      showSnack(responseData);
       setTimeout(() => {
         fetchLists();
       }, 1000);
     } catch (error) {
       if ( error.response.data && error.response.data.message) {
         const resError = error.response.data.message;
-        showSnack('warning', resError);
+        showSnack('Atención:', resError);
     } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
         const resError = error.response.data.errors[0].message;
-        showSnack('warning', resError);
+        showSnack('Atención:', resError);
     } else {
         console.error(`Error adding item to ${listName}:`, error);
-        showSnack('warning', 'Error post MailList');
+        showSnack('Atención:', 'Error post MailList');
       }
     }
   };
@@ -132,12 +136,11 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
   const handleEditItem = async () => {
     try {
       setLoading(true);
-      addTokenToHeaders();
       const updatedData = { ...lists };
       const { listName, newValue, itemIndex } = editItem;
           // Обновление массива
         updatedData[listName][itemIndex] = newValue;
-      await axios.put(`https://p9-remitente.oa.r.appspot.com/lists/`, updatedData);
+      await axiosInstance.put(`/lists/`, updatedData);
       showSnack(`"${newValue}" edited in "${listName}"`);
       setTimeout(() => {
         fetchLists();
@@ -153,13 +156,12 @@ function ListManager({ updateLists, search, showSnack, setLoading, refreshFlag }
     const handleDeleteItem = async () => {
       try {
         setLoading(true);
-        addTokenToHeaders();
         const { listName, itemIndex } = editItem;
         // console.log("Метод удаления элемента",listName,itemIndex)
         const updatedData = { ...lists };
         const valueToDelete = updatedData[listName][itemIndex];
         updatedData[listName] = updatedData[listName].filter((_, index) => index !== itemIndex);
-        const response = await axios.put(`https://p9-remitente.oa.r.appspot.com/lists/`, updatedData);
+        const response = await axiosInstance.put(`/lists/`, updatedData);
         if (response.status === 200) {
           setDelOpen(false);
           showSnack(`Value "${valueToDelete}" from "${listName}" was deleted`);

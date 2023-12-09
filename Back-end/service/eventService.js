@@ -11,7 +11,7 @@ cloudinary.config({
 
 class eventService {
     // Обработчик получения event
-    async getEvents(req, res) {
+    async getEvents() {
             const events = await EventModel.find()
             return(events)
     };

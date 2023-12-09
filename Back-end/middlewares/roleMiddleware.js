@@ -1,12 +1,11 @@
 const ApiError = require('../errors/api-error'); //импорт класса ошибок
 const tokenService = require('../service/tokenService');
-const jwt = require('jsonwebtoken');
 
 module.exports = function (roles) {             //передаем массив ролей!!!
     return function (req, res, next) {
-        if (req.method === "OPTIONS") {     //исключаем метод запросов OPTIONS
-            next();
-        }
+        // if (req.method === "OPTIONS") {     //исключаем метод запросов OPTIONS
+        //     next();
+        // }
         try {
             //проверяю есть ли accessToken
             const authorization = req.headers.authorization;

@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import CssBaseline from '@mui/material/CssBaseline';
 import logo from "../assets/donbosco_logo.png";
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from './Context';
 
 
 function ResetPasswordPage () {
@@ -51,7 +51,7 @@ function ResetPasswordPage () {
       try {
         const response = await axios.post(`https://p9-remitente.oa.r.appspot.com/resetpassword/reset/${userId}/${token}`, { password });
         
-        console.log(response.data.message);
+        // console.log(response.data.message);
         showSnack('success', response.data.message);
         navigate('/');
       } catch (error) {

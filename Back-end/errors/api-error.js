@@ -8,9 +8,9 @@ module.exports = class ApiError extends Error {
         super(message);
         this.status = status;
         this.errors = errors;
-        //в инстанс класса помещаем статус и ошибки
+        //в инстанс класса помещаем status и errors
     }
-    //функции без вызова экземпляра класса:
+    //static-функции без вызова экземпляра класса:
     static UnauthorizedError(status) {
         const message = status === 401 ? 'El usuario no está autorizado' : 'El usuario no tiene acceso';
         return new ApiError(status, message);

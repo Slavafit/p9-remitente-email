@@ -7,11 +7,10 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Stack from '@mui/material/Stack';
-import AddContactModal from "./modals/addContactModal"
-import EditContactModal from "./modals/editContactModal"
-import DelContactModal from "./modals/delContactModal"
-import axios from "axios";
-import { addTokenToHeaders } from "../service/addTokenToHeaders";
+import AddContactModal from "./modals/addContactModal";
+import EditContactModal from "./modals/editContactModal";
+import DelContactModal from "./modals/delContactModal";
+import axiosInstance from '../service/interceptor';
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const StyledFab = styled(Fab)({
@@ -37,13 +36,10 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
   const [selContact, setSelContact] = useState(null); //выбраный контакт
   const [filtered, setFiltered] = useState([]);
 
-  // console.log("ContactTable",contacts);
-
     //закрытие модального окна
   const closeAddModal = () => {
     setAddOpen(false);
   };
-
 
   //функция поиска
   useEffect(() => {
@@ -58,58 +54,48 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
 
 
     //отображение GET
-  const fetchContacts = async () => {
-    try {
-      setLoading(true);
-      addTokenToHeaders();
-      // const response = await axios.get(`https://p9-remitente.oa.r.appspot.com/contacts`);
-      const response = await axios.get(`http://localhost:5000/contacts`);
-      let fetchedContacts = response.data;
-      // console.log("Contact:", fetchedContacts)
-      setContacts(fetchedContacts);
-      updateContacts(fetchedContacts);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching contacts:", error);
-    }
-  };
+    const fetchContacts = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(`/contacts`);
+        let fetchedContacts = response.data;
+        // console.log("Contact:", fetchedContacts)
+        setContacts(fetchedContacts);
+        updateContacts(fetchedContacts);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      }
+    };
 
-    useEffect(() => {
-      fetchContacts();
-    }, [refreshFlag]);
+  useEffect(() => {
+    fetchContacts();
+  }, [refreshFlag]);
 
 
   //добавление contact
   const handleAddContact = async (contactData) => {
-    // console.log(contactData);
     try {
       setLoading(true);
-      addTokenToHeaders();
-      const response = await axios.post(
-        "https://p9-remitente.oa.r.appspot.com/contacts/", contactData);
+      const response = await axiosInstance.post("/contacts/", contactData);
       setAddOpen(false);
-      showSnack('success', response.data.message);
-      setTimeout(() => {
-        fetchContacts();
-      }, 2000);
-      // console.log("contact created:", response.data.message);
+      showSnack(response.data.message);
+      fetchContacts();
       setLoading(false);
     } catch (error) {
       if ( error.response.data && error.response.data.message) {
         const resError = error.response.data.message;
-        // showSnack(resError);
-        showSnack('warning', resError);
+        showSnack('Atención:', resError);
     } else if ( error.response.data.errors && error.response.data.errors.length > 0) {
         const resError = error.response.data.errors[0].message;
         console.log(resError);
-        showSnack('warning', resError);
+        showSnack('Atención:', resError);
     } else {
         console.error(`Error create contact ${listName}:`, error);
-        showSnack('warning', 'Error post contact');
+        showSnack('Atención:', 'Error post contact');
       }
     }
   };
-
 
 
     //показать окно редактирования
@@ -127,15 +113,13 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
       try {
         setLoading(true);
         // console.log(contactData)
-        const response = await axios.put(
-          `https://p9-remitente.oa.r.appspot.com/contacts/${selContact._id}`, contactData);
+        const response = await axiosInstance.put(
+          `/contacts/${selContact._id}`, contactData);
           let message = response.data.nombre
         if (response.status === 200) {
           closeEditModal();
           showSnack(`Contact ${message} was updated`);
-          setTimeout(() => {
-            fetchContacts();
-          }, 2000);
+          fetchContacts();
         }
         setLoading(false);
       } catch (error) {
@@ -155,8 +139,7 @@ const ContactTable = (({lists, showSnack, search, updateContacts, setLoading, re
       try {
         setLoading(true);
         // console.log("handleDeleteContact",selContact);
-        addTokenToHeaders();
-        const response = await axios.delete(`https://p9-remitente.oa.r.appspot.com/contacts/${selContact}`);
+        const response = await axiosInstance.delete(`/contacts/${selContact}`);
         showSnack(response.data.message);
         setDelOpen(false);
         fetchContacts();

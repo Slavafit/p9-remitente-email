@@ -23,8 +23,11 @@ const upload = multer({ storage: storage });
 
 // Использование multer как промежуточного ПО для обработки файлов
 app.use(upload.single('image'));
-// Разрешите CORS для всех запросов
-app.use(cors());
+// Разрешите CORS для запросов
+app.use(cors({
+  origin: process.env.APP_URL,
+  credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/", router);
